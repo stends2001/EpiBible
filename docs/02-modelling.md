@@ -51,7 +51,7 @@ Where:
 - $\gamma$ is the **recovery rate**
 - $N = S + I + R$ is the **total population**
 
-### 2.1.2 SIR model in R
+### SIR model in R
 
 Despite its simplicity, the SIR model can be surprisingly effective. During the COVID-19 pandemic, many government advisors based their projections on variations of this basic framework.
 
