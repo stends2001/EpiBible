@@ -1,0 +1,10 @@
+preface
+overview
+introduction-to-epidemiology
+modelling
+compartmental-models
+sir-model-in-theory
+discrete-time-formulation
+continuous-time-formulation-odes
+sir-model-in-r
+forecasting
