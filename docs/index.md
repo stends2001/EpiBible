@@ -1,7 +1,7 @@
 --- 
 title: "Epibible"
 author: "Sten de Schrijver"
-date: "2025-07-21"
+date: "2025-08-16"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]

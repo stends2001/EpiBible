@@ -1,6 +1,10 @@
 preface
 overview
 introduction-to-epidemiology
+working-with-data
+installing-packages
+installing-world-shapedata
+case-study-yellow-fever
 modelling
 compartmental-models
 sir-model-in-theory
