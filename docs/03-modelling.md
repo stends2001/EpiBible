@@ -216,7 +216,7 @@ library(lubridate)
 library(patchwork)
 
 # --- Load and preprocess data ---
-tbe_local <- read.csv("C:/Users/stend/Documents/2. Extracurricular/EpiBible/tick_borne_encephalitis.csv")
+tbe_local <- read.csv("data/tick_borne_encephalitis.csv")
 
 tbe_national <- tbe_local %>%
   mutate(timestamp = as.Date(timestamp)) %>%

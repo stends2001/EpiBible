@@ -23,7 +23,7 @@
 <meta name="author" content="Sten de Schrijver" />
 
 
-<meta name="date" content="2025-08-16" />
+<meta name="date" content="2025-08-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -122,6 +122,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <style type="text/css">
   
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -235,10 +257,10 @@ R_{t+1} &amp;= R_t + \gamma I_t
 <h3><span class="header-section-number">5.1.2</span> SIR model in R<a href="modelling.html#sir-model-in-r" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Despite its simplicity, the SIR model can be surprisingly effective. During the COVID-19 pandemic, many government advisors based their projections on variations of this basic framework.</p>
 <p>As an example, consider an influenza outbreak that occurred in 1978 at a boarding school in England. The on-site physician documented how many students were sick (in bed) and how many were recovering (convalescent) each day. This dataset is included in the <code>outbreaks</code> R package, allowing us to study it directly.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="modelling.html#cb28-1" tabindex="-1"></a><span class="fu">library</span>(outbreaks)</span>
-<span id="cb28-2"><a href="modelling.html#cb28-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;influenza_england_1978_school&quot;</span>)</span>
-<span id="cb28-3"><a href="modelling.html#cb28-3" tabindex="-1"></a>outbreak_data <span class="ot">&lt;-</span> influenza_england_1978_school</span>
-<span id="cb28-4"><a href="modelling.html#cb28-4" tabindex="-1"></a><span class="fu">head</span>(outbreak_data)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="modelling.html#cb21-1" tabindex="-1"></a><span class="fu">library</span>(outbreaks)</span>
+<span id="cb21-2"><a href="modelling.html#cb21-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;influenza_england_1978_school&quot;</span>)</span>
+<span id="cb21-3"><a href="modelling.html#cb21-3" tabindex="-1"></a>outbreak_data <span class="ot">&lt;-</span> influenza_england_1978_school</span>
+<span id="cb21-4"><a href="modelling.html#cb21-4" tabindex="-1"></a><span class="fu">head</span>(outbreak_data)</span></code></pre></div>
 <pre><code>##         date in_bed convalescent
 ## 1 1978-01-22      3            0
 ## 2 1978-01-23      8            0
@@ -246,94 +268,94 @@ R_{t+1} &amp;= R_t + \gamma I_t
 ## 4 1978-01-25     76            0
 ## 5 1978-01-26    225            9
 ## 6 1978-01-27    298           17</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="modelling.html#cb30-1" tabindex="-1"></a>outbreak_data_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(outbreak_data, </span>
-<span id="cb30-2"><a href="modelling.html#cb30-2" tabindex="-1"></a>                                   <span class="at">cols =</span> <span class="fu">c</span>(in_bed, convalescent),</span>
-<span id="cb30-3"><a href="modelling.html#cb30-3" tabindex="-1"></a>                                   <span class="at">names_to =</span> <span class="st">&quot;group&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;count&quot;</span>)</span>
-<span id="cb30-4"><a href="modelling.html#cb30-4" tabindex="-1"></a></span>
-<span id="cb30-5"><a href="modelling.html#cb30-5" tabindex="-1"></a><span class="fu">ggplot</span>(outbreak_data_long, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> count, <span class="at">color =</span> group)) <span class="sc">+</span></span>
-<span id="cb30-6"><a href="modelling.html#cb30-6" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb30-7"><a href="modelling.html#cb30-7" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb30-8"><a href="modelling.html#cb30-8" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">breaks =</span> outbreak_data_long<span class="sc">$</span>date, <span class="at">date_labels =</span> <span class="st">&quot;%b %d&quot;</span>) <span class="sc">+</span></span>
-<span id="cb30-9"><a href="modelling.html#cb30-9" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Influenza Outbreak (1978 Boarding School)&quot;</span>,</span>
-<span id="cb30-10"><a href="modelling.html#cb30-10" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of Students&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Status&quot;</span>) <span class="sc">+</span></span>
-<span id="cb30-11"><a href="modelling.html#cb30-11" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb30-12"><a href="modelling.html#cb30-12" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="modelling.html#cb23-1" tabindex="-1"></a>outbreak_data_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(outbreak_data, </span>
+<span id="cb23-2"><a href="modelling.html#cb23-2" tabindex="-1"></a>                                   <span class="at">cols =</span> <span class="fu">c</span>(in_bed, convalescent),</span>
+<span id="cb23-3"><a href="modelling.html#cb23-3" tabindex="-1"></a>                                   <span class="at">names_to =</span> <span class="st">&quot;group&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;count&quot;</span>)</span>
+<span id="cb23-4"><a href="modelling.html#cb23-4" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="modelling.html#cb23-5" tabindex="-1"></a><span class="fu">ggplot</span>(outbreak_data_long, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> count, <span class="at">color =</span> group)) <span class="sc">+</span></span>
+<span id="cb23-6"><a href="modelling.html#cb23-6" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="modelling.html#cb23-7" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb23-8"><a href="modelling.html#cb23-8" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">breaks =</span> outbreak_data_long<span class="sc">$</span>date, <span class="at">date_labels =</span> <span class="st">&quot;%b %d&quot;</span>) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="modelling.html#cb23-9" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Influenza Outbreak (1978 Boarding School)&quot;</span>,</span>
+<span id="cb23-10"><a href="modelling.html#cb23-10" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of Students&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Status&quot;</span>) <span class="sc">+</span></span>
+<span id="cb23-11"><a href="modelling.html#cb23-11" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb23-12"><a href="modelling.html#cb23-12" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
 <p><img src="03-modelling_files/figure-html/unnamed-chunk-3-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <p>Now let’s implement the SIR model in R:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="modelling.html#cb31-1" tabindex="-1"></a>sir_model <span class="ot">&lt;-</span> <span class="cf">function</span>(number_of_days, BETA, GAMMA, <span class="at">dt =</span> <span class="dv">1</span>) {</span>
-<span id="cb31-2"><a href="modelling.html#cb31-2" tabindex="-1"></a>  N <span class="ot">&lt;-</span> <span class="dv">763</span></span>
-<span id="cb31-3"><a href="modelling.html#cb31-3" tabindex="-1"></a>  I0 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb31-4"><a href="modelling.html#cb31-4" tabindex="-1"></a>  S0 <span class="ot">&lt;-</span> N <span class="sc">-</span> I0</span>
-<span id="cb31-5"><a href="modelling.html#cb31-5" tabindex="-1"></a>  R0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb31-6"><a href="modelling.html#cb31-6" tabindex="-1"></a></span>
-<span id="cb31-7"><a href="modelling.html#cb31-7" tabindex="-1"></a>  times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, number_of_days, <span class="at">by =</span> dt)</span>
-<span id="cb31-8"><a href="modelling.html#cb31-8" tabindex="-1"></a>  n_steps <span class="ot">&lt;-</span> <span class="fu">length</span>(times)</span>
-<span id="cb31-9"><a href="modelling.html#cb31-9" tabindex="-1"></a></span>
-<span id="cb31-10"><a href="modelling.html#cb31-10" tabindex="-1"></a>  sirdata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb31-11"><a href="modelling.html#cb31-11" tabindex="-1"></a>    <span class="at">t =</span> times,</span>
-<span id="cb31-12"><a href="modelling.html#cb31-12" tabindex="-1"></a>    <span class="at">S =</span> <span class="fu">numeric</span>(n_steps),</span>
-<span id="cb31-13"><a href="modelling.html#cb31-13" tabindex="-1"></a>    <span class="at">I =</span> <span class="fu">numeric</span>(n_steps),</span>
-<span id="cb31-14"><a href="modelling.html#cb31-14" tabindex="-1"></a>    <span class="at">R =</span> <span class="fu">numeric</span>(n_steps)</span>
-<span id="cb31-15"><a href="modelling.html#cb31-15" tabindex="-1"></a>  )</span>
-<span id="cb31-16"><a href="modelling.html#cb31-16" tabindex="-1"></a></span>
-<span id="cb31-17"><a href="modelling.html#cb31-17" tabindex="-1"></a>  sirdata[<span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, S0, I0, R0)</span>
-<span id="cb31-18"><a href="modelling.html#cb31-18" tabindex="-1"></a></span>
-<span id="cb31-19"><a href="modelling.html#cb31-19" tabindex="-1"></a>  <span class="cf">for</span> (tt <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n_steps) {</span>
-<span id="cb31-20"><a href="modelling.html#cb31-20" tabindex="-1"></a>    S_prev <span class="ot">&lt;-</span> sirdata<span class="sc">$</span>S[tt <span class="sc">-</span> <span class="dv">1</span>]</span>
-<span id="cb31-21"><a href="modelling.html#cb31-21" tabindex="-1"></a>    I_prev <span class="ot">&lt;-</span> sirdata<span class="sc">$</span>I[tt <span class="sc">-</span> <span class="dv">1</span>]</span>
-<span id="cb31-22"><a href="modelling.html#cb31-22" tabindex="-1"></a>    R_prev <span class="ot">&lt;-</span> sirdata<span class="sc">$</span>R[tt <span class="sc">-</span> <span class="dv">1</span>]</span>
-<span id="cb31-23"><a href="modelling.html#cb31-23" tabindex="-1"></a></span>
-<span id="cb31-24"><a href="modelling.html#cb31-24" tabindex="-1"></a>    new_infections <span class="ot">&lt;-</span> BETA <span class="sc">*</span> S_prev <span class="sc">*</span> I_prev <span class="sc">*</span> dt</span>
-<span id="cb31-25"><a href="modelling.html#cb31-25" tabindex="-1"></a>    new_recoveries <span class="ot">&lt;-</span> GAMMA <span class="sc">*</span> I_prev <span class="sc">*</span> dt</span>
-<span id="cb31-26"><a href="modelling.html#cb31-26" tabindex="-1"></a></span>
-<span id="cb31-27"><a href="modelling.html#cb31-27" tabindex="-1"></a>    new_infections <span class="ot">&lt;-</span> <span class="fu">min</span>(new_infections, S_prev)</span>
-<span id="cb31-28"><a href="modelling.html#cb31-28" tabindex="-1"></a>    new_recoveries <span class="ot">&lt;-</span> <span class="fu">min</span>(new_recoveries, I_prev)</span>
-<span id="cb31-29"><a href="modelling.html#cb31-29" tabindex="-1"></a></span>
-<span id="cb31-30"><a href="modelling.html#cb31-30" tabindex="-1"></a>    S_new <span class="ot">&lt;-</span> S_prev <span class="sc">-</span> new_infections</span>
-<span id="cb31-31"><a href="modelling.html#cb31-31" tabindex="-1"></a>    I_new <span class="ot">&lt;-</span> I_prev <span class="sc">+</span> new_infections <span class="sc">-</span> new_recoveries</span>
-<span id="cb31-32"><a href="modelling.html#cb31-32" tabindex="-1"></a>    R_new <span class="ot">&lt;-</span> R_prev <span class="sc">+</span> new_recoveries</span>
-<span id="cb31-33"><a href="modelling.html#cb31-33" tabindex="-1"></a></span>
-<span id="cb31-34"><a href="modelling.html#cb31-34" tabindex="-1"></a>    sirdata[tt, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(times[tt], S_new, I_new, R_new)</span>
-<span id="cb31-35"><a href="modelling.html#cb31-35" tabindex="-1"></a>  }</span>
-<span id="cb31-36"><a href="modelling.html#cb31-36" tabindex="-1"></a></span>
-<span id="cb31-37"><a href="modelling.html#cb31-37" tabindex="-1"></a>  <span class="fu">return</span>(sirdata)</span>
-<span id="cb31-38"><a href="modelling.html#cb31-38" tabindex="-1"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="modelling.html#cb32-1" tabindex="-1"></a>output <span class="ot">=</span> <span class="fu">sir_model</span>(<span class="dv">14</span>, <span class="fl">0.0026</span>, <span class="fl">0.565</span>, <span class="fl">0.1</span>)</span>
-<span id="cb32-2"><a href="modelling.html#cb32-2" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="modelling.html#cb32-3" tabindex="-1"></a>sirdata_long <span class="ot">=</span> <span class="fu">pivot_longer</span>(output, <span class="at">cols =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;R&quot;</span>),</span>
-<span id="cb32-4"><a href="modelling.html#cb32-4" tabindex="-1"></a>                            <span class="at">names_to =</span> <span class="st">&quot;compartment&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;count&quot;</span>)</span>
-<span id="cb32-5"><a href="modelling.html#cb32-5" tabindex="-1"></a></span>
-<span id="cb32-6"><a href="modelling.html#cb32-6" tabindex="-1"></a><span class="fu">ggplot</span>(sirdata_long, <span class="fu">aes</span>(<span class="at">x =</span> t, <span class="at">y =</span> count, <span class="at">color =</span> compartment)) <span class="sc">+</span></span>
-<span id="cb32-7"><a href="modelling.html#cb32-7" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb32-8"><a href="modelling.html#cb32-8" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Influenza Outbreak (1978 Boarding School)&quot;</span>,</span>
-<span id="cb32-9"><a href="modelling.html#cb32-9" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of Students&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Status&quot;</span>) <span class="sc">+</span></span>
-<span id="cb32-10"><a href="modelling.html#cb32-10" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="modelling.html#cb24-1" tabindex="-1"></a>sir_model <span class="ot">&lt;-</span> <span class="cf">function</span>(number_of_days, BETA, GAMMA, <span class="at">dt =</span> <span class="dv">1</span>) {</span>
+<span id="cb24-2"><a href="modelling.html#cb24-2" tabindex="-1"></a>  N <span class="ot">&lt;-</span> <span class="dv">763</span></span>
+<span id="cb24-3"><a href="modelling.html#cb24-3" tabindex="-1"></a>  I0 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb24-4"><a href="modelling.html#cb24-4" tabindex="-1"></a>  S0 <span class="ot">&lt;-</span> N <span class="sc">-</span> I0</span>
+<span id="cb24-5"><a href="modelling.html#cb24-5" tabindex="-1"></a>  R0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb24-6"><a href="modelling.html#cb24-6" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="modelling.html#cb24-7" tabindex="-1"></a>  times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, number_of_days, <span class="at">by =</span> dt)</span>
+<span id="cb24-8"><a href="modelling.html#cb24-8" tabindex="-1"></a>  n_steps <span class="ot">&lt;-</span> <span class="fu">length</span>(times)</span>
+<span id="cb24-9"><a href="modelling.html#cb24-9" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="modelling.html#cb24-10" tabindex="-1"></a>  sirdata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-11"><a href="modelling.html#cb24-11" tabindex="-1"></a>    <span class="at">t =</span> times,</span>
+<span id="cb24-12"><a href="modelling.html#cb24-12" tabindex="-1"></a>    <span class="at">S =</span> <span class="fu">numeric</span>(n_steps),</span>
+<span id="cb24-13"><a href="modelling.html#cb24-13" tabindex="-1"></a>    <span class="at">I =</span> <span class="fu">numeric</span>(n_steps),</span>
+<span id="cb24-14"><a href="modelling.html#cb24-14" tabindex="-1"></a>    <span class="at">R =</span> <span class="fu">numeric</span>(n_steps)</span>
+<span id="cb24-15"><a href="modelling.html#cb24-15" tabindex="-1"></a>  )</span>
+<span id="cb24-16"><a href="modelling.html#cb24-16" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="modelling.html#cb24-17" tabindex="-1"></a>  sirdata[<span class="dv">1</span>, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, S0, I0, R0)</span>
+<span id="cb24-18"><a href="modelling.html#cb24-18" tabindex="-1"></a></span>
+<span id="cb24-19"><a href="modelling.html#cb24-19" tabindex="-1"></a>  <span class="cf">for</span> (tt <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n_steps) {</span>
+<span id="cb24-20"><a href="modelling.html#cb24-20" tabindex="-1"></a>    S_prev <span class="ot">&lt;-</span> sirdata<span class="sc">$</span>S[tt <span class="sc">-</span> <span class="dv">1</span>]</span>
+<span id="cb24-21"><a href="modelling.html#cb24-21" tabindex="-1"></a>    I_prev <span class="ot">&lt;-</span> sirdata<span class="sc">$</span>I[tt <span class="sc">-</span> <span class="dv">1</span>]</span>
+<span id="cb24-22"><a href="modelling.html#cb24-22" tabindex="-1"></a>    R_prev <span class="ot">&lt;-</span> sirdata<span class="sc">$</span>R[tt <span class="sc">-</span> <span class="dv">1</span>]</span>
+<span id="cb24-23"><a href="modelling.html#cb24-23" tabindex="-1"></a></span>
+<span id="cb24-24"><a href="modelling.html#cb24-24" tabindex="-1"></a>    new_infections <span class="ot">&lt;-</span> BETA <span class="sc">*</span> S_prev <span class="sc">*</span> I_prev <span class="sc">*</span> dt</span>
+<span id="cb24-25"><a href="modelling.html#cb24-25" tabindex="-1"></a>    new_recoveries <span class="ot">&lt;-</span> GAMMA <span class="sc">*</span> I_prev <span class="sc">*</span> dt</span>
+<span id="cb24-26"><a href="modelling.html#cb24-26" tabindex="-1"></a></span>
+<span id="cb24-27"><a href="modelling.html#cb24-27" tabindex="-1"></a>    new_infections <span class="ot">&lt;-</span> <span class="fu">min</span>(new_infections, S_prev)</span>
+<span id="cb24-28"><a href="modelling.html#cb24-28" tabindex="-1"></a>    new_recoveries <span class="ot">&lt;-</span> <span class="fu">min</span>(new_recoveries, I_prev)</span>
+<span id="cb24-29"><a href="modelling.html#cb24-29" tabindex="-1"></a></span>
+<span id="cb24-30"><a href="modelling.html#cb24-30" tabindex="-1"></a>    S_new <span class="ot">&lt;-</span> S_prev <span class="sc">-</span> new_infections</span>
+<span id="cb24-31"><a href="modelling.html#cb24-31" tabindex="-1"></a>    I_new <span class="ot">&lt;-</span> I_prev <span class="sc">+</span> new_infections <span class="sc">-</span> new_recoveries</span>
+<span id="cb24-32"><a href="modelling.html#cb24-32" tabindex="-1"></a>    R_new <span class="ot">&lt;-</span> R_prev <span class="sc">+</span> new_recoveries</span>
+<span id="cb24-33"><a href="modelling.html#cb24-33" tabindex="-1"></a></span>
+<span id="cb24-34"><a href="modelling.html#cb24-34" tabindex="-1"></a>    sirdata[tt, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(times[tt], S_new, I_new, R_new)</span>
+<span id="cb24-35"><a href="modelling.html#cb24-35" tabindex="-1"></a>  }</span>
+<span id="cb24-36"><a href="modelling.html#cb24-36" tabindex="-1"></a></span>
+<span id="cb24-37"><a href="modelling.html#cb24-37" tabindex="-1"></a>  <span class="fu">return</span>(sirdata)</span>
+<span id="cb24-38"><a href="modelling.html#cb24-38" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="modelling.html#cb25-1" tabindex="-1"></a>output <span class="ot">=</span> <span class="fu">sir_model</span>(<span class="dv">14</span>, <span class="fl">0.0026</span>, <span class="fl">0.565</span>, <span class="fl">0.1</span>)</span>
+<span id="cb25-2"><a href="modelling.html#cb25-2" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="modelling.html#cb25-3" tabindex="-1"></a>sirdata_long <span class="ot">=</span> <span class="fu">pivot_longer</span>(output, <span class="at">cols =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;R&quot;</span>),</span>
+<span id="cb25-4"><a href="modelling.html#cb25-4" tabindex="-1"></a>                            <span class="at">names_to =</span> <span class="st">&quot;compartment&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;count&quot;</span>)</span>
+<span id="cb25-5"><a href="modelling.html#cb25-5" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="modelling.html#cb25-6" tabindex="-1"></a><span class="fu">ggplot</span>(sirdata_long, <span class="fu">aes</span>(<span class="at">x =</span> t, <span class="at">y =</span> count, <span class="at">color =</span> compartment)) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="modelling.html#cb25-7" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb25-8"><a href="modelling.html#cb25-8" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Influenza Outbreak (1978 Boarding School)&quot;</span>,</span>
+<span id="cb25-9"><a href="modelling.html#cb25-9" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of Students&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Status&quot;</span>) <span class="sc">+</span></span>
+<span id="cb25-10"><a href="modelling.html#cb25-10" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
 <p><img src="03-modelling_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>Let’s now compare the observed <code>in_bed</code> data with the simulated number of infectious individuals:</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="modelling.html#cb33-1" tabindex="-1"></a>sir_output <span class="ot">&lt;-</span> <span class="fu">sir_model</span>(<span class="dv">14</span>, <span class="fl">0.0026</span>, <span class="fl">0.565</span>, <span class="at">dt =</span> <span class="fl">0.1</span>)</span>
-<span id="cb33-2"><a href="modelling.html#cb33-2" tabindex="-1"></a></span>
-<span id="cb33-3"><a href="modelling.html#cb33-3" tabindex="-1"></a>sir_daily <span class="ot">&lt;-</span> sir_output <span class="sc">%&gt;%</span></span>
-<span id="cb33-4"><a href="modelling.html#cb33-4" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">day =</span> <span class="fu">floor</span>(t)) <span class="sc">%&gt;%</span></span>
-<span id="cb33-5"><a href="modelling.html#cb33-5" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">I_simulated =</span> <span class="fu">mean</span>(I))</span>
-<span id="cb33-6"><a href="modelling.html#cb33-6" tabindex="-1"></a></span>
-<span id="cb33-7"><a href="modelling.html#cb33-7" tabindex="-1"></a>observed_data <span class="ot">&lt;-</span> outbreak_data <span class="sc">%&gt;%</span></span>
-<span id="cb33-8"><a href="modelling.html#cb33-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">day =</span> <span class="fu">as.numeric</span>(date <span class="sc">-</span> <span class="fu">min</span>(date))) <span class="sc">%&gt;%</span></span>
-<span id="cb33-9"><a href="modelling.html#cb33-9" tabindex="-1"></a>  <span class="fu">select</span>(day, in_bed)</span>
-<span id="cb33-10"><a href="modelling.html#cb33-10" tabindex="-1"></a></span>
-<span id="cb33-11"><a href="modelling.html#cb33-11" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">left_join</span>(observed_data, sir_daily, <span class="at">by =</span> <span class="st">&quot;day&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb33-12"><a href="modelling.html#cb33-12" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(in_bed, I_simulated),</span>
-<span id="cb33-13"><a href="modelling.html#cb33-13" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;type&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;count&quot;</span>)</span>
-<span id="cb33-14"><a href="modelling.html#cb33-14" tabindex="-1"></a></span>
-<span id="cb33-15"><a href="modelling.html#cb33-15" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> day, <span class="at">y =</span> count, <span class="at">color =</span> type)) <span class="sc">+</span></span>
-<span id="cb33-16"><a href="modelling.html#cb33-16" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb33-17"><a href="modelling.html#cb33-17" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb33-18"><a href="modelling.html#cb33-18" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="fu">max</span>(plot_data<span class="sc">$</span>day)) <span class="sc">+</span></span>
-<span id="cb33-19"><a href="modelling.html#cb33-19" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Observed vs Simulated Infections&quot;</span>,</span>
-<span id="cb33-20"><a href="modelling.html#cb33-20" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Days Since Outbreak Start&quot;</span>,</span>
-<span id="cb33-21"><a href="modelling.html#cb33-21" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of Students&quot;</span>,</span>
-<span id="cb33-22"><a href="modelling.html#cb33-22" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">&quot;Data Type&quot;</span>) <span class="sc">+</span></span>
-<span id="cb33-23"><a href="modelling.html#cb33-23" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb33-24"><a href="modelling.html#cb33-24" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="modelling.html#cb26-1" tabindex="-1"></a>sir_output <span class="ot">&lt;-</span> <span class="fu">sir_model</span>(<span class="dv">14</span>, <span class="fl">0.0026</span>, <span class="fl">0.565</span>, <span class="at">dt =</span> <span class="fl">0.1</span>)</span>
+<span id="cb26-2"><a href="modelling.html#cb26-2" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="modelling.html#cb26-3" tabindex="-1"></a>sir_daily <span class="ot">&lt;-</span> sir_output <span class="sc">%&gt;%</span></span>
+<span id="cb26-4"><a href="modelling.html#cb26-4" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">day =</span> <span class="fu">floor</span>(t)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-5"><a href="modelling.html#cb26-5" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">I_simulated =</span> <span class="fu">mean</span>(I))</span>
+<span id="cb26-6"><a href="modelling.html#cb26-6" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="modelling.html#cb26-7" tabindex="-1"></a>observed_data <span class="ot">&lt;-</span> outbreak_data <span class="sc">%&gt;%</span></span>
+<span id="cb26-8"><a href="modelling.html#cb26-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">day =</span> <span class="fu">as.numeric</span>(date <span class="sc">-</span> <span class="fu">min</span>(date))) <span class="sc">%&gt;%</span></span>
+<span id="cb26-9"><a href="modelling.html#cb26-9" tabindex="-1"></a>  <span class="fu">select</span>(day, in_bed)</span>
+<span id="cb26-10"><a href="modelling.html#cb26-10" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="modelling.html#cb26-11" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">left_join</span>(observed_data, sir_daily, <span class="at">by =</span> <span class="st">&quot;day&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-12"><a href="modelling.html#cb26-12" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(in_bed, I_simulated),</span>
+<span id="cb26-13"><a href="modelling.html#cb26-13" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;type&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;count&quot;</span>)</span>
+<span id="cb26-14"><a href="modelling.html#cb26-14" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="modelling.html#cb26-15" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> day, <span class="at">y =</span> count, <span class="at">color =</span> type)) <span class="sc">+</span></span>
+<span id="cb26-16"><a href="modelling.html#cb26-16" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb26-17"><a href="modelling.html#cb26-17" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb26-18"><a href="modelling.html#cb26-18" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="fu">max</span>(plot_data<span class="sc">$</span>day)) <span class="sc">+</span></span>
+<span id="cb26-19"><a href="modelling.html#cb26-19" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Observed vs Simulated Infections&quot;</span>,</span>
+<span id="cb26-20"><a href="modelling.html#cb26-20" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Days Since Outbreak Start&quot;</span>,</span>
+<span id="cb26-21"><a href="modelling.html#cb26-21" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of Students&quot;</span>,</span>
+<span id="cb26-22"><a href="modelling.html#cb26-22" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">&quot;Data Type&quot;</span>) <span class="sc">+</span></span>
+<span id="cb26-23"><a href="modelling.html#cb26-23" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb26-24"><a href="modelling.html#cb26-24" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>))</span></code></pre></div>
 <p><img src="03-modelling_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 </div>
@@ -344,110 +366,115 @@ R_{t+1} &amp;= R_t + \gamma I_t
 <p>ARIMA (AutoRegressive Integrated Moving Average), a flexible class of models that can account for autoregressive lags, differencing (trends), and moving average components, including seasonal extensions (SARIMA).</p>
 <p>Unlike mechanistic models (e.g., SIR), these statistical methods do not rely on assumptions about transmission mechanisms. Instead, they learn from the patterns and structure of historical data to forecast future values.</p>
 <p>We apply both models to weekly national tick-borne encephalitis (TBE) cases and generate forecasts for the year following a specified historical cutoff.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="modelling.html#cb34-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb34-2"><a href="modelling.html#cb34-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb34-3"><a href="modelling.html#cb34-3" tabindex="-1"></a><span class="fu">library</span>(forecast)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="modelling.html#cb27-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb27-2"><a href="modelling.html#cb27-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb27-3"><a href="modelling.html#cb27-3" tabindex="-1"></a><span class="fu">library</span>(forecast)</span></code></pre></div>
 <pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
 ##   method            from
 ##   as.zoo.data.frame zoo</code></pre>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="modelling.html#cb36-1" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb36-2"><a href="modelling.html#cb36-2" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
-<span id="cb36-3"><a href="modelling.html#cb36-3" tabindex="-1"></a></span>
-<span id="cb36-4"><a href="modelling.html#cb36-4" tabindex="-1"></a><span class="co"># --- Load and preprocess data ---</span></span>
-<span id="cb36-5"><a href="modelling.html#cb36-5" tabindex="-1"></a>tbe_local <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;C:/Users/stend/Documents/2. Extracurricular/EpiBible/tick_borne_encephalitis.csv&quot;</span>)</span>
-<span id="cb36-6"><a href="modelling.html#cb36-6" tabindex="-1"></a></span>
-<span id="cb36-7"><a href="modelling.html#cb36-7" tabindex="-1"></a>tbe_national <span class="ot">&lt;-</span> tbe_local <span class="sc">%&gt;%</span></span>
-<span id="cb36-8"><a href="modelling.html#cb36-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">timestamp =</span> <span class="fu">as.Date</span>(timestamp)) <span class="sc">%&gt;%</span></span>
-<span id="cb36-9"><a href="modelling.html#cb36-9" tabindex="-1"></a>  <span class="fu">group_by</span>(timestamp) <span class="sc">%&gt;%</span></span>
-<span id="cb36-10"><a href="modelling.html#cb36-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>)</span>
-<span id="cb36-11"><a href="modelling.html#cb36-11" tabindex="-1"></a></span>
-<span id="cb36-12"><a href="modelling.html#cb36-12" tabindex="-1"></a><span class="co"># --- Forecasting setup ---</span></span>
-<span id="cb36-13"><a href="modelling.html#cb36-13" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="dv">2018</span>  <span class="co"># Change to define cutoff year</span></span>
-<span id="cb36-14"><a href="modelling.html#cb36-14" tabindex="-1"></a></span>
-<span id="cb36-15"><a href="modelling.html#cb36-15" tabindex="-1"></a>tbe_national_context <span class="ot">&lt;-</span> tbe_national <span class="sc">%&gt;%</span></span>
-<span id="cb36-16"><a href="modelling.html#cb36-16" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(timestamp) <span class="sc">&lt;=</span> year)</span>
-<span id="cb36-17"><a href="modelling.html#cb36-17" tabindex="-1"></a></span>
-<span id="cb36-18"><a href="modelling.html#cb36-18" tabindex="-1"></a>tbe_national_future <span class="ot">&lt;-</span> tbe_national <span class="sc">%&gt;%</span></span>
-<span id="cb36-19"><a href="modelling.html#cb36-19" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(timestamp) <span class="sc">==</span> year <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb36-20"><a href="modelling.html#cb36-20" tabindex="-1"></a>  <span class="fu">arrange</span>(timestamp)</span>
-<span id="cb36-21"><a href="modelling.html#cb36-21" tabindex="-1"></a></span>
-<span id="cb36-22"><a href="modelling.html#cb36-22" tabindex="-1"></a><span class="co"># ---- Create time series object ----</span></span>
-<span id="cb36-23"><a href="modelling.html#cb36-23" tabindex="-1"></a>context_ts <span class="ot">&lt;-</span> <span class="fu">ts</span>(tbe_national_context<span class="sc">$</span>cases, <span class="at">frequency =</span> <span class="dv">52</span>)</span>
-<span id="cb36-24"><a href="modelling.html#cb36-24" tabindex="-1"></a></span>
-<span id="cb36-25"><a href="modelling.html#cb36-25" tabindex="-1"></a><span class="co"># ---- Holt-Winters model ----</span></span>
-<span id="cb36-26"><a href="modelling.html#cb36-26" tabindex="-1"></a>hw_model <span class="ot">&lt;-</span> <span class="fu">HoltWinters</span>(context_ts)</span>
-<span id="cb36-27"><a href="modelling.html#cb36-27" tabindex="-1"></a>forecast_hw <span class="ot">&lt;-</span> <span class="fu">forecast</span>(hw_model, <span class="at">h =</span> <span class="dv">52</span>)</span>
-<span id="cb36-28"><a href="modelling.html#cb36-28" tabindex="-1"></a></span>
-<span id="cb36-29"><a href="modelling.html#cb36-29" tabindex="-1"></a>predicted_df_hw <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb36-30"><a href="modelling.html#cb36-30" tabindex="-1"></a>  <span class="at">timestamp =</span> <span class="fu">seq.Date</span>(<span class="at">from =</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(year <span class="sc">+</span> <span class="dv">1</span>, <span class="st">&quot;-01-01&quot;</span>)), <span class="at">by =</span> <span class="st">&quot;week&quot;</span>, <span class="at">length.out =</span> <span class="dv">52</span>),</span>
-<span id="cb36-31"><a href="modelling.html#cb36-31" tabindex="-1"></a>  <span class="at">cases =</span> <span class="fu">as.numeric</span>(forecast_hw<span class="sc">$</span>mean),</span>
-<span id="cb36-32"><a href="modelling.html#cb36-32" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;predicted_hw&quot;</span></span>
-<span id="cb36-33"><a href="modelling.html#cb36-33" tabindex="-1"></a>)</span>
-<span id="cb36-34"><a href="modelling.html#cb36-34" tabindex="-1"></a></span>
-<span id="cb36-35"><a href="modelling.html#cb36-35" tabindex="-1"></a><span class="co"># ---- ARIMA model ----</span></span>
-<span id="cb36-36"><a href="modelling.html#cb36-36" tabindex="-1"></a>arima_model <span class="ot">&lt;-</span> <span class="fu">auto.arima</span>(context_ts, <span class="at">seasonal =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb36-37"><a href="modelling.html#cb36-37" tabindex="-1"></a>forecast_arima <span class="ot">&lt;-</span> <span class="fu">forecast</span>(arima_model, <span class="at">h =</span> <span class="dv">52</span>)</span>
-<span id="cb36-38"><a href="modelling.html#cb36-38" tabindex="-1"></a></span>
-<span id="cb36-39"><a href="modelling.html#cb36-39" tabindex="-1"></a>predicted_df_arima <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb36-40"><a href="modelling.html#cb36-40" tabindex="-1"></a>  <span class="at">timestamp =</span> <span class="fu">seq.Date</span>(<span class="at">from =</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(year <span class="sc">+</span> <span class="dv">1</span>, <span class="st">&quot;-01-01&quot;</span>)), <span class="at">by =</span> <span class="st">&quot;week&quot;</span>, <span class="at">length.out =</span> <span class="dv">52</span>),</span>
-<span id="cb36-41"><a href="modelling.html#cb36-41" tabindex="-1"></a>  <span class="at">cases =</span> <span class="fu">as.numeric</span>(forecast_arima<span class="sc">$</span>mean),</span>
-<span id="cb36-42"><a href="modelling.html#cb36-42" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;predicted_arima&quot;</span></span>
-<span id="cb36-43"><a href="modelling.html#cb36-43" tabindex="-1"></a>)</span>
-<span id="cb36-44"><a href="modelling.html#cb36-44" tabindex="-1"></a></span>
-<span id="cb36-45"><a href="modelling.html#cb36-45" tabindex="-1"></a><span class="co"># ---- Combine all data for plotting ----</span></span>
-<span id="cb36-46"><a href="modelling.html#cb36-46" tabindex="-1"></a>context_labeled <span class="ot">&lt;-</span> tbe_national_context <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;historical&quot;</span>)</span>
-<span id="cb36-47"><a href="modelling.html#cb36-47" tabindex="-1"></a>future_labeled  <span class="ot">&lt;-</span> tbe_national_future <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;observed&quot;</span>)</span>
-<span id="cb36-48"><a href="modelling.html#cb36-48" tabindex="-1"></a></span>
-<span id="cb36-49"><a href="modelling.html#cb36-49" tabindex="-1"></a>combined_data <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(context_labeled, future_labeled, predicted_df_hw, predicted_df_arima)</span>
-<span id="cb36-50"><a href="modelling.html#cb36-50" tabindex="-1"></a></span>
-<span id="cb36-51"><a href="modelling.html#cb36-51" tabindex="-1"></a><span class="co"># ---- Plot full timeline ----</span></span>
-<span id="cb36-52"><a href="modelling.html#cb36-52" tabindex="-1"></a>main_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(combined_data, <span class="fu">aes</span>(<span class="at">x =</span> timestamp, <span class="at">y =</span> cases, <span class="at">color =</span> type)) <span class="sc">+</span></span>
-<span id="cb36-53"><a href="modelling.html#cb36-53" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb36-54"><a href="modelling.html#cb36-54" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb36-55"><a href="modelling.html#cb36-55" tabindex="-1"></a>    <span class="st">&quot;historical&quot;</span>      <span class="ot">=</span> <span class="st">&quot;#1f77b4&quot;</span>,</span>
-<span id="cb36-56"><a href="modelling.html#cb36-56" tabindex="-1"></a>    <span class="st">&quot;observed&quot;</span>        <span class="ot">=</span> <span class="st">&quot;#2ca02c&quot;</span>,</span>
-<span id="cb36-57"><a href="modelling.html#cb36-57" tabindex="-1"></a>    <span class="st">&quot;predicted_hw&quot;</span>    <span class="ot">=</span> <span class="st">&quot;#d62728&quot;</span>,</span>
-<span id="cb36-58"><a href="modelling.html#cb36-58" tabindex="-1"></a>    <span class="st">&quot;predicted_arima&quot;</span> <span class="ot">=</span> <span class="st">&quot;#ff7f0e&quot;</span></span>
-<span id="cb36-59"><a href="modelling.html#cb36-59" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb36-60"><a href="modelling.html#cb36-60" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb36-61"><a href="modelling.html#cb36-61" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb36-62"><a href="modelling.html#cb36-62" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;TBE Weekly Cases: Forecasting&quot;</span>, year <span class="sc">+</span> <span class="dv">1</span>),</span>
-<span id="cb36-63"><a href="modelling.html#cb36-63" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Time&quot;</span>,</span>
-<span id="cb36-64"><a href="modelling.html#cb36-64" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Cases&quot;</span>,</span>
-<span id="cb36-65"><a href="modelling.html#cb36-65" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Data Type&quot;</span></span>
-<span id="cb36-66"><a href="modelling.html#cb36-66" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb36-67"><a href="modelling.html#cb36-67" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb36-68"><a href="modelling.html#cb36-68" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;top&quot;</span>,</span>
-<span id="cb36-69"><a href="modelling.html#cb36-69" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">16</span>)</span>
-<span id="cb36-70"><a href="modelling.html#cb36-70" tabindex="-1"></a>  )</span>
-<span id="cb36-71"><a href="modelling.html#cb36-71" tabindex="-1"></a></span>
-<span id="cb36-72"><a href="modelling.html#cb36-72" tabindex="-1"></a><span class="co"># ---- Plot zoomed forecast year ----</span></span>
-<span id="cb36-73"><a href="modelling.html#cb36-73" tabindex="-1"></a>zoom_plot <span class="ot">&lt;-</span> combined_data <span class="sc">%&gt;%</span></span>
-<span id="cb36-74"><a href="modelling.html#cb36-74" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(timestamp) <span class="sc">==</span> year <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb36-75"><a href="modelling.html#cb36-75" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> timestamp, <span class="at">y =</span> cases, <span class="at">color =</span> type)) <span class="sc">+</span></span>
-<span id="cb36-76"><a href="modelling.html#cb36-76" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb36-77"><a href="modelling.html#cb36-77" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb36-78"><a href="modelling.html#cb36-78" tabindex="-1"></a>    <span class="st">&quot;historical&quot;</span>      <span class="ot">=</span> <span class="st">&quot;#1f77b4&quot;</span>,</span>
-<span id="cb36-79"><a href="modelling.html#cb36-79" tabindex="-1"></a>    <span class="st">&quot;observed&quot;</span>        <span class="ot">=</span> <span class="st">&quot;#2ca02c&quot;</span>,</span>
-<span id="cb36-80"><a href="modelling.html#cb36-80" tabindex="-1"></a>    <span class="st">&quot;predicted_hw&quot;</span>    <span class="ot">=</span> <span class="st">&quot;#d62728&quot;</span>,</span>
-<span id="cb36-81"><a href="modelling.html#cb36-81" tabindex="-1"></a>    <span class="st">&quot;predicted_arima&quot;</span> <span class="ot">=</span> <span class="st">&quot;#ff7f0e&quot;</span></span>
-<span id="cb36-82"><a href="modelling.html#cb36-82" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb36-83"><a href="modelling.html#cb36-83" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb36-84"><a href="modelling.html#cb36-84" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb36-85"><a href="modelling.html#cb36-85" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;Zoom: Forecasts vs Observed in&quot;</span>, year <span class="sc">+</span> <span class="dv">1</span>),</span>
-<span id="cb36-86"><a href="modelling.html#cb36-86" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Week&quot;</span>,</span>
-<span id="cb36-87"><a href="modelling.html#cb36-87" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Cases&quot;</span></span>
-<span id="cb36-88"><a href="modelling.html#cb36-88" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb36-89"><a href="modelling.html#cb36-89" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb36-90"><a href="modelling.html#cb36-90" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
-<span id="cb36-91"><a href="modelling.html#cb36-91" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>)</span>
-<span id="cb36-92"><a href="modelling.html#cb36-92" tabindex="-1"></a>  )</span>
-<span id="cb36-93"><a href="modelling.html#cb36-93" tabindex="-1"></a></span>
-<span id="cb36-94"><a href="modelling.html#cb36-94" tabindex="-1"></a><span class="co"># ---- Combine and show ----</span></span>
-<span id="cb36-95"><a href="modelling.html#cb36-95" tabindex="-1"></a>main_plot <span class="sc">/</span> zoom_plot <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="modelling.html#cb29-1" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb29-2"><a href="modelling.html#cb29-2" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb29-3"><a href="modelling.html#cb29-3" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="modelling.html#cb29-4" tabindex="-1"></a><span class="co"># --- Load and preprocess data ---</span></span>
+<span id="cb29-5"><a href="modelling.html#cb29-5" tabindex="-1"></a>tbe_local <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;data/tick_borne_encephalitis.csv&quot;</span>)</span>
+<span id="cb29-6"><a href="modelling.html#cb29-6" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="modelling.html#cb29-7" tabindex="-1"></a>tbe_national <span class="ot">&lt;-</span> tbe_local <span class="sc">%&gt;%</span></span>
+<span id="cb29-8"><a href="modelling.html#cb29-8" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">timestamp =</span> <span class="fu">as.Date</span>(timestamp)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-9"><a href="modelling.html#cb29-9" tabindex="-1"></a>  <span class="fu">group_by</span>(timestamp) <span class="sc">%&gt;%</span></span>
+<span id="cb29-10"><a href="modelling.html#cb29-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>)</span>
+<span id="cb29-11"><a href="modelling.html#cb29-11" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="modelling.html#cb29-12" tabindex="-1"></a><span class="co"># --- Forecasting setup ---</span></span>
+<span id="cb29-13"><a href="modelling.html#cb29-13" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="dv">2018</span>  <span class="co"># Change to define cutoff year</span></span>
+<span id="cb29-14"><a href="modelling.html#cb29-14" tabindex="-1"></a></span>
+<span id="cb29-15"><a href="modelling.html#cb29-15" tabindex="-1"></a>tbe_national_context <span class="ot">&lt;-</span> tbe_national <span class="sc">%&gt;%</span></span>
+<span id="cb29-16"><a href="modelling.html#cb29-16" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(timestamp) <span class="sc">&lt;=</span> year)</span>
+<span id="cb29-17"><a href="modelling.html#cb29-17" tabindex="-1"></a></span>
+<span id="cb29-18"><a href="modelling.html#cb29-18" tabindex="-1"></a>tbe_national_future <span class="ot">&lt;-</span> tbe_national <span class="sc">%&gt;%</span></span>
+<span id="cb29-19"><a href="modelling.html#cb29-19" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(timestamp) <span class="sc">==</span> year <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-20"><a href="modelling.html#cb29-20" tabindex="-1"></a>  <span class="fu">arrange</span>(timestamp)</span>
+<span id="cb29-21"><a href="modelling.html#cb29-21" tabindex="-1"></a></span>
+<span id="cb29-22"><a href="modelling.html#cb29-22" tabindex="-1"></a><span class="co"># ---- Create time series object ----</span></span>
+<span id="cb29-23"><a href="modelling.html#cb29-23" tabindex="-1"></a>context_ts <span class="ot">&lt;-</span> <span class="fu">ts</span>(tbe_national_context<span class="sc">$</span>cases, <span class="at">frequency =</span> <span class="dv">52</span>)</span>
+<span id="cb29-24"><a href="modelling.html#cb29-24" tabindex="-1"></a></span>
+<span id="cb29-25"><a href="modelling.html#cb29-25" tabindex="-1"></a><span class="co"># ---- Holt-Winters model ----</span></span>
+<span id="cb29-26"><a href="modelling.html#cb29-26" tabindex="-1"></a>hw_model <span class="ot">&lt;-</span> <span class="fu">HoltWinters</span>(context_ts)</span>
+<span id="cb29-27"><a href="modelling.html#cb29-27" tabindex="-1"></a>forecast_hw <span class="ot">&lt;-</span> <span class="fu">forecast</span>(hw_model, <span class="at">h =</span> <span class="dv">52</span>)</span>
+<span id="cb29-28"><a href="modelling.html#cb29-28" tabindex="-1"></a></span>
+<span id="cb29-29"><a href="modelling.html#cb29-29" tabindex="-1"></a>predicted_df_hw <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb29-30"><a href="modelling.html#cb29-30" tabindex="-1"></a>  <span class="at">timestamp =</span> <span class="fu">seq.Date</span>(<span class="at">from =</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(year <span class="sc">+</span> <span class="dv">1</span>, <span class="st">&quot;-01-01&quot;</span>)), <span class="at">by =</span> <span class="st">&quot;week&quot;</span>, <span class="at">length.out =</span> <span class="dv">52</span>),</span>
+<span id="cb29-31"><a href="modelling.html#cb29-31" tabindex="-1"></a>  <span class="at">cases =</span> <span class="fu">as.numeric</span>(forecast_hw<span class="sc">$</span>mean),</span>
+<span id="cb29-32"><a href="modelling.html#cb29-32" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;predicted_hw&quot;</span></span>
+<span id="cb29-33"><a href="modelling.html#cb29-33" tabindex="-1"></a>)</span>
+<span id="cb29-34"><a href="modelling.html#cb29-34" tabindex="-1"></a></span>
+<span id="cb29-35"><a href="modelling.html#cb29-35" tabindex="-1"></a><span class="co"># ---- ARIMA model ----</span></span>
+<span id="cb29-36"><a href="modelling.html#cb29-36" tabindex="-1"></a>arima_model <span class="ot">&lt;-</span> <span class="fu">auto.arima</span>(context_ts, <span class="at">seasonal =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-37"><a href="modelling.html#cb29-37" tabindex="-1"></a>forecast_arima <span class="ot">&lt;-</span> <span class="fu">forecast</span>(arima_model, <span class="at">h =</span> <span class="dv">52</span>)</span>
+<span id="cb29-38"><a href="modelling.html#cb29-38" tabindex="-1"></a></span>
+<span id="cb29-39"><a href="modelling.html#cb29-39" tabindex="-1"></a>predicted_df_arima <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb29-40"><a href="modelling.html#cb29-40" tabindex="-1"></a>  <span class="at">timestamp =</span> <span class="fu">seq.Date</span>(<span class="at">from =</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(year <span class="sc">+</span> <span class="dv">1</span>, <span class="st">&quot;-01-01&quot;</span>)), <span class="at">by =</span> <span class="st">&quot;week&quot;</span>, <span class="at">length.out =</span> <span class="dv">52</span>),</span>
+<span id="cb29-41"><a href="modelling.html#cb29-41" tabindex="-1"></a>  <span class="at">cases =</span> <span class="fu">as.numeric</span>(forecast_arima<span class="sc">$</span>mean),</span>
+<span id="cb29-42"><a href="modelling.html#cb29-42" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;predicted_arima&quot;</span></span>
+<span id="cb29-43"><a href="modelling.html#cb29-43" tabindex="-1"></a>)</span>
+<span id="cb29-44"><a href="modelling.html#cb29-44" tabindex="-1"></a></span>
+<span id="cb29-45"><a href="modelling.html#cb29-45" tabindex="-1"></a><span class="co"># ---- Combine all data for plotting ----</span></span>
+<span id="cb29-46"><a href="modelling.html#cb29-46" tabindex="-1"></a>context_labeled <span class="ot">&lt;-</span> tbe_national_context <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;historical&quot;</span>)</span>
+<span id="cb29-47"><a href="modelling.html#cb29-47" tabindex="-1"></a>future_labeled  <span class="ot">&lt;-</span> tbe_national_future <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;observed&quot;</span>)</span>
+<span id="cb29-48"><a href="modelling.html#cb29-48" tabindex="-1"></a></span>
+<span id="cb29-49"><a href="modelling.html#cb29-49" tabindex="-1"></a>combined_data <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(context_labeled, future_labeled, predicted_df_hw, predicted_df_arima)</span>
+<span id="cb29-50"><a href="modelling.html#cb29-50" tabindex="-1"></a></span>
+<span id="cb29-51"><a href="modelling.html#cb29-51" tabindex="-1"></a><span class="co"># ---- Plot full timeline ----</span></span>
+<span id="cb29-52"><a href="modelling.html#cb29-52" tabindex="-1"></a>main_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(combined_data, <span class="fu">aes</span>(<span class="at">x =</span> timestamp, <span class="at">y =</span> cases, <span class="at">color =</span> type)) <span class="sc">+</span></span>
+<span id="cb29-53"><a href="modelling.html#cb29-53" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb29-54"><a href="modelling.html#cb29-54" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb29-55"><a href="modelling.html#cb29-55" tabindex="-1"></a>    <span class="st">&quot;historical&quot;</span>      <span class="ot">=</span> <span class="st">&quot;#1f77b4&quot;</span>,</span>
+<span id="cb29-56"><a href="modelling.html#cb29-56" tabindex="-1"></a>    <span class="st">&quot;observed&quot;</span>        <span class="ot">=</span> <span class="st">&quot;#2ca02c&quot;</span>,</span>
+<span id="cb29-57"><a href="modelling.html#cb29-57" tabindex="-1"></a>    <span class="st">&quot;predicted_hw&quot;</span>    <span class="ot">=</span> <span class="st">&quot;#d62728&quot;</span>,</span>
+<span id="cb29-58"><a href="modelling.html#cb29-58" tabindex="-1"></a>    <span class="st">&quot;predicted_arima&quot;</span> <span class="ot">=</span> <span class="st">&quot;#ff7f0e&quot;</span></span>
+<span id="cb29-59"><a href="modelling.html#cb29-59" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb29-60"><a href="modelling.html#cb29-60" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb29-61"><a href="modelling.html#cb29-61" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb29-62"><a href="modelling.html#cb29-62" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;TBE Weekly Cases: Forecasting&quot;</span>, year <span class="sc">+</span> <span class="dv">1</span>),</span>
+<span id="cb29-63"><a href="modelling.html#cb29-63" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Time&quot;</span>,</span>
+<span id="cb29-64"><a href="modelling.html#cb29-64" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Cases&quot;</span>,</span>
+<span id="cb29-65"><a href="modelling.html#cb29-65" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Data Type&quot;</span></span>
+<span id="cb29-66"><a href="modelling.html#cb29-66" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb29-67"><a href="modelling.html#cb29-67" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb29-68"><a href="modelling.html#cb29-68" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;top&quot;</span>,</span>
+<span id="cb29-69"><a href="modelling.html#cb29-69" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">16</span>)</span>
+<span id="cb29-70"><a href="modelling.html#cb29-70" tabindex="-1"></a>  )</span>
+<span id="cb29-71"><a href="modelling.html#cb29-71" tabindex="-1"></a></span>
+<span id="cb29-72"><a href="modelling.html#cb29-72" tabindex="-1"></a><span class="co"># ---- Plot zoomed forecast year ----</span></span>
+<span id="cb29-73"><a href="modelling.html#cb29-73" tabindex="-1"></a>zoom_plot <span class="ot">&lt;-</span> combined_data <span class="sc">%&gt;%</span></span>
+<span id="cb29-74"><a href="modelling.html#cb29-74" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">year</span>(timestamp) <span class="sc">==</span> year <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-75"><a href="modelling.html#cb29-75" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> timestamp, <span class="at">y =</span> cases, <span class="at">color =</span> type)) <span class="sc">+</span></span>
+<span id="cb29-76"><a href="modelling.html#cb29-76" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb29-77"><a href="modelling.html#cb29-77" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb29-78"><a href="modelling.html#cb29-78" tabindex="-1"></a>    <span class="st">&quot;historical&quot;</span>      <span class="ot">=</span> <span class="st">&quot;#1f77b4&quot;</span>,</span>
+<span id="cb29-79"><a href="modelling.html#cb29-79" tabindex="-1"></a>    <span class="st">&quot;observed&quot;</span>        <span class="ot">=</span> <span class="st">&quot;#2ca02c&quot;</span>,</span>
+<span id="cb29-80"><a href="modelling.html#cb29-80" tabindex="-1"></a>    <span class="st">&quot;predicted_hw&quot;</span>    <span class="ot">=</span> <span class="st">&quot;#d62728&quot;</span>,</span>
+<span id="cb29-81"><a href="modelling.html#cb29-81" tabindex="-1"></a>    <span class="st">&quot;predicted_arima&quot;</span> <span class="ot">=</span> <span class="st">&quot;#ff7f0e&quot;</span></span>
+<span id="cb29-82"><a href="modelling.html#cb29-82" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb29-83"><a href="modelling.html#cb29-83" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb29-84"><a href="modelling.html#cb29-84" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb29-85"><a href="modelling.html#cb29-85" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;Zoom: Forecasts vs Observed in&quot;</span>, year <span class="sc">+</span> <span class="dv">1</span>),</span>
+<span id="cb29-86"><a href="modelling.html#cb29-86" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Week&quot;</span>,</span>
+<span id="cb29-87"><a href="modelling.html#cb29-87" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Cases&quot;</span></span>
+<span id="cb29-88"><a href="modelling.html#cb29-88" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb29-89"><a href="modelling.html#cb29-89" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb29-90"><a href="modelling.html#cb29-90" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb29-91"><a href="modelling.html#cb29-91" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>)</span>
+<span id="cb29-92"><a href="modelling.html#cb29-92" tabindex="-1"></a>  )</span>
+<span id="cb29-93"><a href="modelling.html#cb29-93" tabindex="-1"></a></span>
+<span id="cb29-94"><a href="modelling.html#cb29-94" tabindex="-1"></a><span class="co"># ---- Combine and show ----</span></span>
+<span id="cb29-95"><a href="modelling.html#cb29-95" tabindex="-1"></a>main_plot <span class="sc">/</span> zoom_plot <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</span></code></pre></div>
 <p><img src="03-modelling_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 This analysis demonstrates how different statistical forecasting methods—Holt-Winters vs ARIMA—perform on the same epidemiological time series. While Holt-Winters is intuitive and captures seasonality well, ARIMA can offer greater flexibility in modeling autocorrelated structures. Comparing their predictions side-by-side allows us to evaluate model fit and choose an approach best suited for early warning or planning systems.</p>
 
+<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div class="csl-entry">
+Chippaux, J. P., &amp; Chippaux, A. (2018). Yellow fever in africa and the americas: A historical and epidemiological perspective. <em>Journal of Venomous Animals and Toxins Including Tropical Diseases</em>, <em>24</em>. <a href="https://doi.org/10.1186/s40409-018-0162-y">https://doi.org/10.1186/s40409-018-0162-y</a>
+</div>
+</div>
 </div>
 </div>
             </section>
@@ -498,7 +525,7 @@ gitbook.start({
 "link": null,
 "text": null
 },
-"download": ["mybook.pdf", "mybook.epub"],
+"download": ["EpiBible.pdf", "EpiBible.epub"],
 "search": {
 "engine": "fuse",
 "options": null

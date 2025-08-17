@@ -1,16 +1,16 @@
 --- 
 title: "Epibible"
 author: "Sten de Schrijver"
-date: "2025-08-16"
+date: "2025-08-17"
 site: bookdown::bookdown_site
 documentclass: book
-bibliography: [book.bib, packages.bib]
-description: |
-link-citations: yes
+bibliography: 
+  - bibliography/bibs/mendeley.bib
+  - bibliography/bibs/greylit.bib
+  - bibliography/bibs/packages.bib  
+csl: bibliography/apa.csl
 ---
-
 # Preface
-
 
 
 

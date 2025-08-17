@@ -6,51 +6,33 @@ Data is at the heart of epidemiology. We look at where and when diseases occur, 
 
 ```r
 library(scales)
-library(tidyverse)
-```
-
-```
-## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-## ✔ purrr     1.0.2     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ readr::col_factor() masks scales::col_factor()
-## ✖ purrr::discard()    masks scales::discard()
-## ✖ dplyr::filter()     masks stats::filter()
-## ✖ dplyr::lag()        masks stats::lag()
-## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-```
-
-```r
-library(gapminder)
 library(ggplot2)
-library(rnaturalearth)
-library(rnaturalearthdata)
-```
-
-```
-## 
-## Attaching package: 'rnaturalearthdata'
-## 
-## The following object is masked from 'package:rnaturalearth':
-## 
-##     countries110
-```
-
-```r
 library(readr)
-library(sf)   
 ```
 
 ```
-## Linking to GEOS 3.11.2, GDAL 3.8.2, PROJ 9.3.1; sf_use_s2() is TRUE
+## 
+## Attaching package: 'readr'
+```
+
+```
+## The following object is masked from 'package:scales':
+## 
+##     col_factor
 ```
 
 ```r
 library(glue)
+
+# The following packages print a lot of noise when installing so I silence their output
+# by wrapping them in a `suppressPackageStartupMessages({})
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(gapminder)
+  library(rnaturalearth)
+  library(rnaturalearthdata)
+  library(sf)
+})
 ```
 
 ### Installing world shapedata
@@ -87,32 +69,19 @@ ggplot(world_shapefile) +
 ## Case study: Yellow Fever
 
 **Context**
-Yellow fever (YF) is a severe and sometimes fatal hemorrhagic fever caused by a flavivirus with a single-stranded, negatively oriented RNA genome. It primarily affects regions in Africa and Latin America, where the virus sustains itself through a sylvatic cycle involving wild mosquitoes and non-human primates. In Brazil, for instance, mosquito species like Haemagogus and Sabethes maintain this cycle in forested areas. While a highly effective vaccine exists, yellow fever outbreaks still occur, particularly when the virus spills over into urban settings.
 
-Historically, yellow fever was confined to Africa until the transatlantic slave trade introduced it to Latin America, where favorable climates and mosquito vectors allowed it to take root. Cities like New Orleans suffered repeated, devastating outbreaks in the past. Brazil saw a decline in cases mid-20th century, but a resurgence occurred between 2016 and 2018, with over 2,000 reported cases and a strikingly high death toll of 681. This resurgence was partly driven by the spread of the virus into urban areas, facilitated by Aedes aegypti and Aedes albopictus, mosquitoes that thrive in cities. Curiously, yellow fever has never established itself in Asia despite the presence of competent vectors and similar arboviruses, a mystery that may relate to immunological cross-reactivity with other flaviviruses like dengue.
+Yellow fever (YF) is a severe and sometimes fatal hemorrhagic fever caused by a flavivirus with a single-stranded, negatively oriented RNA genome. It primarily affects regions in Africa and Latin America, where the virus sustains itself through a sylvatic cycle involving wild mosquitoes and non-human primates. In Brazil, for instance, mosquito species like Haemagogus and Sabethes maintain this cycle in forested areas. While a highly effective vaccine exists, yellow fever outbreaks still occur, particularly when the virus spills over into urban settings [@Chippaux2018].
 
-(Reference: Chippaux, 2018: https://doi.org/10.1186/s40409-018-0162-y)
+Historically, yellow fever was confined to Africa until the transatlantic slave trade introduced it to Latin America, where favorable climates and mosquito vectors allowed it to take root. Cities like New Orleans suffered repeated, devastating outbreaks in the past. Brazil saw a decline in cases mid-20th century, but a resurgence occurred between 2016 and 2018, with over 2,000 reported cases and a strikingly high death toll of 681. This resurgence was partly driven by the spread of the virus into urban areas, facilitated by Aedes aegypti and Aedes albopictus, mosquitoes that thrive in cities. Curiously, yellow fever has never established itself in Asia despite the presence of competent vectors and similar arboviruses, a mystery that may relate to immunological cross-reactivity with other flaviviruses like dengue [@Chippaux2018].
 
 The WHO has data data available for download for many different things, including casenumbers for many infectious diseases, including that for YF. The raw data for YF you can find [here](https://www.who.int/data/gho/data/indicators/indicator-details/GHO/yellow-fever-number-of-reported-cases). I have cleaned this data a little so that the dataframe is as concise as possible, and so that all the countrynames correctly map to the ones in the **world_shapefile** dataset.
 
 **import data**
 
 ```r
-who_yellowfever = read_csv("data/cleaned_yellowfever.csv")
-```
+who_yellowfever = read_csv("data/cleaned_yellowfever.csv", show_col_types = FALSE)
 
-```
-## Rows: 4029 Columns: 3
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: ","
-## chr (1): country
-## dbl (2): year, cases
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
-
-```r
+# head allows us to preview the table
 head(who_yellowfever)
 ```
 
@@ -129,6 +98,7 @@ head(who_yellowfever)
 ```
 
 ```r
+# draw up some specifications of the dataset
 n_countries = length(unique(who_yellowfever$country))
 first_year  = min(who_yellowfever$year)
 last_year   = max(who_yellowfever$year)
@@ -151,8 +121,8 @@ global_yearly_casenumbers <- who_yellowfever %>%
 
 
 ggplot(global_yearly_casenumbers) + 
-  geom_line(aes(x = year, y = cases), color = 'black', size = 1.5) +  # black outline
-  geom_line(aes(x = year, y = cases), color = '#ffcc00', size = 1) +  # yellow line
+  geom_line(aes(x = year, y = cases), color = 'black', linewidth = 1.5) +  # black outline
+  geom_line(aes(x = year, y = cases), color = '#ffcc00', linewidth = 1) +  # yellow line
   scale_x_continuous(breaks = pretty_breaks(n = 20)) +                # I don't want a break per year. I do a max of 20 year
   theme_classic(base_size = 14)  + 
   labs(
@@ -162,14 +132,6 @@ ggplot(global_yearly_casenumbers) +
   )
 ```
 
-```
-## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
-```
-
 <img src="02-working-with-data_files/figure-html/unnamed-chunk-4-1.png" width="1440" style="display: block; margin: auto;" />
 
 **Yearly cases per continent**
@@ -177,18 +139,11 @@ ggplot(global_yearly_casenumbers) +
 ```r
 yearly_casenumbers_continent = merge(who_yellowfever, countries_continents, by = "country") %>% 
   group_by(year, continent) %>% 
-  summarise(cases = sum(cases)) %>% 
+  summarise(cases = sum(cases), .groups = "drop") %>% 
   filter(continent %in% continents_list)
-```
 
-```
-## `summarise()` has grouped output by 'year'. You can override using the
-## `.groups` argument.
-```
-
-```r
 ggplot(yearly_casenumbers_continent) + 
-  geom_line(aes(x = year, y = cases, color = continent), size = 1.5) + 
+  geom_line(aes(x = year, y = cases, color = continent), linewidth = 1.5) + 
   scale_x_continuous(breaks = pretty_breaks(n = 20)) +
   theme_classic(base_size = 14) + 
   scale_color_brewer(palette = "Dark2") +  # 7 distinct colors
@@ -267,6 +222,14 @@ plot_country = function(country_filter){
 
 ```r
 plot_country("Dem. Rep. Congo")
+```
+
+```
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
 ```
 
 <img src="02-working-with-data_files/figure-html/unnamed-chunk-8-1.png" width="1440" style="display: block; margin: auto;" />
