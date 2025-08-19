@@ -1,5 +1,5 @@
 introduction-to-epidemiology
-chapter-2-getting-started-with-r
+getting-started-with-r
 installing-r-and-rstudio
 starting-to-code
 r-fundamentals
@@ -9,6 +9,7 @@ data-structures
 writing-scripts
 tidyverse
 data-wrangling-using-dplyr
+tidy-functions
 data-visualization-using-ggplot
 working-with-epidemiological-data
 acessing-data

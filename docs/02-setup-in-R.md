@@ -1,4 +1,4 @@
-# Chapter 2 Getting Started with R
+# Getting Started with R
 
 ## Installing R and Rstudio
 
