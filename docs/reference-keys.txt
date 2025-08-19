@@ -1,8 +1,7 @@
 introduction-to-epidemiology
-setup-in-r
-essential-r-terminology
+chapter-2-getting-started-with-r
 installing-r-and-rstudio
-r-projects-and-organization
+starting-to-code
 r-fundamentals
 r-syntax
 troubleshooting
