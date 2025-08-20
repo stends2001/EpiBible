@@ -1,4 +1,9 @@
 introduction-to-epidemiology
+working-with-this-book
+what-is-bookdown
+what-is-markdown
+code-snippets
+other-formats-in-this-book
 getting-started-with-r
 installing-r-and-rstudio
 starting-to-code
