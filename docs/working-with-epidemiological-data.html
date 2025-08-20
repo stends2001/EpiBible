@@ -23,7 +23,7 @@
 <meta name="author" content="Sten de Schrijver" />
 
 
-<meta name="date" content="2025-08-19" />
+<meta name="date" content="2025-08-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -180,11 +180,9 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="4" data-path="tidyverse.html"><a href="tidyverse.html"><i class="fa fa-check"></i><b>4</b> Tidyverse</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="tidyverse.html"><a href="tidyverse.html#data-wrangling-using-dplyr"><i class="fa fa-check"></i><b>4.1</b> Data wrangling using dplyr</a>
-<ul>
-<li class="chapter" data-level="4.1.1" data-path="tidyverse.html"><a href="tidyverse.html#tidy-functions"><i class="fa fa-check"></i><b>4.1.1</b> Tidy functions</a></li>
-</ul></li>
-<li class="chapter" data-level="4.2" data-path="tidyverse.html"><a href="tidyverse.html#data-visualization-using-ggplot"><i class="fa fa-check"></i><b>4.2</b> Data visualization using ggplot</a></li>
+<li class="chapter" data-level="4.1" data-path="tidyverse.html"><a href="tidyverse.html#wide-and-tidy-data"><i class="fa fa-check"></i><b>4.1</b> Wide and tidy data</a></li>
+<li class="chapter" data-level="4.2" data-path="tidyverse.html"><a href="tidyverse.html#data-wrangling-using-dplyr"><i class="fa fa-check"></i><b>4.2</b> Data wrangling using dplyr</a></li>
+<li class="chapter" data-level="4.3" data-path="tidyverse.html"><a href="tidyverse.html#data-visualization-using-ggplot"><i class="fa fa-check"></i><b>4.3</b> Data visualization using ggplot</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="working-with-epidemiological-data.html"><a href="working-with-epidemiological-data.html"><i class="fa fa-check"></i><b>5</b> Working with epidemiological data</a>
 <ul>
@@ -254,59 +252,59 @@ div.csl-indent {
 <p>The WHO has data data available for download for many different things, including casenumbers for many infectious diseases, including that for YF. The raw data for YF you can find <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/yellow-fever-number-of-reported-cases">here</a>. I have cleaned this data a little so that the dataframe is as concise as possible, and so that all the countrynames correctly map to the ones in the <strong>world_shapefile</strong> dataset.</p>
 <div id="installing-packages" class="section level4 hasAnchor" number="5.3.0.1">
 <h4><span class="header-section-number">5.3.0.1</span> Installing packages<a href="working-with-epidemiological-data.html#installing-packages" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="working-with-epidemiological-data.html#cb34-1" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
-<span id="cb34-2"><a href="working-with-epidemiological-data.html#cb34-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb34-3"><a href="working-with-epidemiological-data.html#cb34-3" tabindex="-1"></a><span class="fu">library</span>(readr)</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="working-with-epidemiological-data.html#cb42-1" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb42-2"><a href="working-with-epidemiological-data.html#cb42-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb42-3"><a href="working-with-epidemiological-data.html#cb42-3" tabindex="-1"></a><span class="fu">library</span>(readr)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;readr&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:scales&#39;:
 ## 
 ##     col_factor</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="working-with-epidemiological-data.html#cb37-1" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
-<span id="cb37-2"><a href="working-with-epidemiological-data.html#cb37-2" tabindex="-1"></a></span>
-<span id="cb37-3"><a href="working-with-epidemiological-data.html#cb37-3" tabindex="-1"></a><span class="co"># The following packages print a lot of noise when installing so I silence their output</span></span>
-<span id="cb37-4"><a href="working-with-epidemiological-data.html#cb37-4" tabindex="-1"></a><span class="co"># by wrapping them in a `suppressPackageStartupMessages({})</span></span>
-<span id="cb37-5"><a href="working-with-epidemiological-data.html#cb37-5" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>({</span>
-<span id="cb37-6"><a href="working-with-epidemiological-data.html#cb37-6" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
-<span id="cb37-7"><a href="working-with-epidemiological-data.html#cb37-7" tabindex="-1"></a>  <span class="fu">library</span>(gapminder)</span>
-<span id="cb37-8"><a href="working-with-epidemiological-data.html#cb37-8" tabindex="-1"></a>  <span class="fu">library</span>(rnaturalearth)</span>
-<span id="cb37-9"><a href="working-with-epidemiological-data.html#cb37-9" tabindex="-1"></a>  <span class="fu">library</span>(rnaturalearthdata)</span>
-<span id="cb37-10"><a href="working-with-epidemiological-data.html#cb37-10" tabindex="-1"></a>  <span class="fu">library</span>(sf)</span>
-<span id="cb37-11"><a href="working-with-epidemiological-data.html#cb37-11" tabindex="-1"></a>})</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="working-with-epidemiological-data.html#cb45-1" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
+<span id="cb45-2"><a href="working-with-epidemiological-data.html#cb45-2" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="working-with-epidemiological-data.html#cb45-3" tabindex="-1"></a><span class="co"># The following packages print a lot of noise when installing so I silence their output</span></span>
+<span id="cb45-4"><a href="working-with-epidemiological-data.html#cb45-4" tabindex="-1"></a><span class="co"># by wrapping them in a `suppressPackageStartupMessages({})</span></span>
+<span id="cb45-5"><a href="working-with-epidemiological-data.html#cb45-5" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>({</span>
+<span id="cb45-6"><a href="working-with-epidemiological-data.html#cb45-6" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
+<span id="cb45-7"><a href="working-with-epidemiological-data.html#cb45-7" tabindex="-1"></a>  <span class="fu">library</span>(gapminder)</span>
+<span id="cb45-8"><a href="working-with-epidemiological-data.html#cb45-8" tabindex="-1"></a>  <span class="fu">library</span>(rnaturalearth)</span>
+<span id="cb45-9"><a href="working-with-epidemiological-data.html#cb45-9" tabindex="-1"></a>  <span class="fu">library</span>(rnaturalearthdata)</span>
+<span id="cb45-10"><a href="working-with-epidemiological-data.html#cb45-10" tabindex="-1"></a>  <span class="fu">library</span>(sf)</span>
+<span id="cb45-11"><a href="working-with-epidemiological-data.html#cb45-11" tabindex="-1"></a>})</span></code></pre></div>
 </div>
 <div id="installing-world-shapedata" class="section level4 hasAnchor" number="5.3.0.2">
 <h4><span class="header-section-number">5.3.0.2</span> Installing world shapedata<a href="working-with-epidemiological-data.html#installing-world-shapedata" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Eventually, I want to show you how to make some plots and some maps. For that, we need to load the shape of the world, so that we can fill in countries with certain colors and such. For that we’ll load the <strong>world shapefile</strong> from the package <em>rnaturalearth</em>. This dataset includes many different columns, but we only require some of them; name, geometry and continent.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="working-with-epidemiological-data.html#cb38-1" tabindex="-1"></a>world_shapefile              <span class="ot">=</span> <span class="fu">ne_countries</span>(<span class="at">scale =</span> <span class="st">&quot;medium&quot;</span>, <span class="at">returnclass =</span> <span class="st">&quot;sf&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">&quot;name&quot;</span>,<span class="st">&quot;geometry&quot;</span>, <span class="st">&quot;continent&quot;</span>))</span>
-<span id="cb38-2"><a href="working-with-epidemiological-data.html#cb38-2" tabindex="-1"></a><span class="fu">colnames</span>(world_shapefile)[<span class="dv">1</span>] <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;country&quot;</span>)</span>
-<span id="cb38-3"><a href="working-with-epidemiological-data.html#cb38-3" tabindex="-1"></a>continents_list              <span class="ot">=</span> <span class="fu">unique</span>(world_shapefile<span class="sc">$</span>continent)</span>
-<span id="cb38-4"><a href="working-with-epidemiological-data.html#cb38-4" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="working-with-epidemiological-data.html#cb38-5" tabindex="-1"></a>countries_continents <span class="ot">&lt;-</span> world_shapefile <span class="sc">%&gt;%</span></span>
-<span id="cb38-6"><a href="working-with-epidemiological-data.html#cb38-6" tabindex="-1"></a>  <span class="fu">st_set_geometry</span>(<span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb38-7"><a href="working-with-epidemiological-data.html#cb38-7" tabindex="-1"></a>  <span class="fu">select</span>(country, continent)</span>
-<span id="cb38-8"><a href="working-with-epidemiological-data.html#cb38-8" tabindex="-1"></a></span>
-<span id="cb38-9"><a href="working-with-epidemiological-data.html#cb38-9" tabindex="-1"></a><span class="co"># World map</span></span>
-<span id="cb38-10"><a href="working-with-epidemiological-data.html#cb38-10" tabindex="-1"></a></span>
-<span id="cb38-11"><a href="working-with-epidemiological-data.html#cb38-11" tabindex="-1"></a><span class="fu">ggplot</span>(world_shapefile) <span class="sc">+</span></span>
-<span id="cb38-12"><a href="working-with-epidemiological-data.html#cb38-12" tabindex="-1"></a>    <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> continent), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.01</span>) <span class="sc">+</span></span>
-<span id="cb38-13"><a href="working-with-epidemiological-data.html#cb38-13" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
-<span id="cb38-14"><a href="working-with-epidemiological-data.html#cb38-14" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb38-15"><a href="working-with-epidemiological-data.html#cb38-15" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">&#39;world shapefile&#39;</span>,</span>
-<span id="cb38-16"><a href="working-with-epidemiological-data.html#cb38-16" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb38-17"><a href="working-with-epidemiological-data.html#cb38-17" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
-<span id="cb38-18"><a href="working-with-epidemiological-data.html#cb38-18" tabindex="-1"></a>      <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">&quot;#f7f9fc&quot;</span>),</span>
-<span id="cb38-19"><a href="working-with-epidemiological-data.html#cb38-19" tabindex="-1"></a>      <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span>,</span>
-<span id="cb38-20"><a href="working-with-epidemiological-data.html#cb38-20" tabindex="-1"></a>      <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
-<span id="cb38-21"><a href="working-with-epidemiological-data.html#cb38-21" tabindex="-1"></a>      <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)</span>
-<span id="cb38-22"><a href="working-with-epidemiological-data.html#cb38-22" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="working-with-epidemiological-data.html#cb46-1" tabindex="-1"></a>world_shapefile              <span class="ot">=</span> <span class="fu">ne_countries</span>(<span class="at">scale =</span> <span class="st">&quot;medium&quot;</span>, <span class="at">returnclass =</span> <span class="st">&quot;sf&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">&quot;name&quot;</span>,<span class="st">&quot;geometry&quot;</span>, <span class="st">&quot;continent&quot;</span>))</span>
+<span id="cb46-2"><a href="working-with-epidemiological-data.html#cb46-2" tabindex="-1"></a><span class="fu">colnames</span>(world_shapefile)[<span class="dv">1</span>] <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;country&quot;</span>)</span>
+<span id="cb46-3"><a href="working-with-epidemiological-data.html#cb46-3" tabindex="-1"></a>continents_list              <span class="ot">=</span> <span class="fu">unique</span>(world_shapefile<span class="sc">$</span>continent)</span>
+<span id="cb46-4"><a href="working-with-epidemiological-data.html#cb46-4" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="working-with-epidemiological-data.html#cb46-5" tabindex="-1"></a>countries_continents <span class="ot">&lt;-</span> world_shapefile <span class="sc">%&gt;%</span></span>
+<span id="cb46-6"><a href="working-with-epidemiological-data.html#cb46-6" tabindex="-1"></a>  <span class="fu">st_set_geometry</span>(<span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb46-7"><a href="working-with-epidemiological-data.html#cb46-7" tabindex="-1"></a>  <span class="fu">select</span>(country, continent)</span>
+<span id="cb46-8"><a href="working-with-epidemiological-data.html#cb46-8" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="working-with-epidemiological-data.html#cb46-9" tabindex="-1"></a><span class="co"># World map</span></span>
+<span id="cb46-10"><a href="working-with-epidemiological-data.html#cb46-10" tabindex="-1"></a></span>
+<span id="cb46-11"><a href="working-with-epidemiological-data.html#cb46-11" tabindex="-1"></a><span class="fu">ggplot</span>(world_shapefile) <span class="sc">+</span></span>
+<span id="cb46-12"><a href="working-with-epidemiological-data.html#cb46-12" tabindex="-1"></a>    <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> continent), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.01</span>) <span class="sc">+</span></span>
+<span id="cb46-13"><a href="working-with-epidemiological-data.html#cb46-13" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb46-14"><a href="working-with-epidemiological-data.html#cb46-14" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb46-15"><a href="working-with-epidemiological-data.html#cb46-15" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">&#39;world shapefile&#39;</span>,</span>
+<span id="cb46-16"><a href="working-with-epidemiological-data.html#cb46-16" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb46-17"><a href="working-with-epidemiological-data.html#cb46-17" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb46-18"><a href="working-with-epidemiological-data.html#cb46-18" tabindex="-1"></a>      <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">&quot;#f7f9fc&quot;</span>),</span>
+<span id="cb46-19"><a href="working-with-epidemiological-data.html#cb46-19" tabindex="-1"></a>      <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span>,</span>
+<span id="cb46-20"><a href="working-with-epidemiological-data.html#cb46-20" tabindex="-1"></a>      <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb46-21"><a href="working-with-epidemiological-data.html#cb46-21" tabindex="-1"></a>      <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)</span>
+<span id="cb46-22"><a href="working-with-epidemiological-data.html#cb46-22" tabindex="-1"></a>    )</span></code></pre></div>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-2-1.png" width="1344" style="display: block; margin: auto;" /></p>
 </div>
 <div id="yellow-fever-data" class="section level4 hasAnchor" number="5.3.0.3">
 <h4><span class="header-section-number">5.3.0.3</span> Yellow Fever data<a href="working-with-epidemiological-data.html#yellow-fever-data" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="working-with-epidemiological-data.html#cb39-1" tabindex="-1"></a>who_yellowfever <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/cleaned_yellowfever.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb39-2"><a href="working-with-epidemiological-data.html#cb39-2" tabindex="-1"></a></span>
-<span id="cb39-3"><a href="working-with-epidemiological-data.html#cb39-3" tabindex="-1"></a><span class="co"># head allows us to preview the table</span></span>
-<span id="cb39-4"><a href="working-with-epidemiological-data.html#cb39-4" tabindex="-1"></a><span class="fu">head</span>(who_yellowfever)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="working-with-epidemiological-data.html#cb47-1" tabindex="-1"></a>who_yellowfever <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/cleaned_yellowfever.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb47-2"><a href="working-with-epidemiological-data.html#cb47-2" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="working-with-epidemiological-data.html#cb47-3" tabindex="-1"></a><span class="co"># head allows us to preview the table</span></span>
+<span id="cb47-4"><a href="working-with-epidemiological-data.html#cb47-4" tabindex="-1"></a><span class="fu">head</span>(who_yellowfever)</span></code></pre></div>
 <pre><code>## # A tibble: 6 × 3
 ##   country            year cases
 ##   &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;
@@ -316,131 +314,131 @@ div.csl-indent {
 ## 4 Antigua and Barb.  2024     0
 ## 5 Armenia            2024     0
 ## 6 Aruba              2024     0</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="working-with-epidemiological-data.html#cb41-1" tabindex="-1"></a><span class="co"># draw up some specifications of the dataset</span></span>
-<span id="cb41-2"><a href="working-with-epidemiological-data.html#cb41-2" tabindex="-1"></a>n_countries <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">unique</span>(who_yellowfever<span class="sc">$</span>country))</span>
-<span id="cb41-3"><a href="working-with-epidemiological-data.html#cb41-3" tabindex="-1"></a>first_year  <span class="ot">=</span> <span class="fu">min</span>(who_yellowfever<span class="sc">$</span>year)</span>
-<span id="cb41-4"><a href="working-with-epidemiological-data.html#cb41-4" tabindex="-1"></a>last_year   <span class="ot">=</span> <span class="fu">max</span>(who_yellowfever<span class="sc">$</span>year)</span>
-<span id="cb41-5"><a href="working-with-epidemiological-data.html#cb41-5" tabindex="-1"></a></span>
-<span id="cb41-6"><a href="working-with-epidemiological-data.html#cb41-6" tabindex="-1"></a><span class="fu">glue</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">The dataframe contains yearly casedata for {n_countries} countries between {first_year} and {last_year}&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="working-with-epidemiological-data.html#cb49-1" tabindex="-1"></a><span class="co"># draw up some specifications of the dataset</span></span>
+<span id="cb49-2"><a href="working-with-epidemiological-data.html#cb49-2" tabindex="-1"></a>n_countries <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">unique</span>(who_yellowfever<span class="sc">$</span>country))</span>
+<span id="cb49-3"><a href="working-with-epidemiological-data.html#cb49-3" tabindex="-1"></a>first_year  <span class="ot">=</span> <span class="fu">min</span>(who_yellowfever<span class="sc">$</span>year)</span>
+<span id="cb49-4"><a href="working-with-epidemiological-data.html#cb49-4" tabindex="-1"></a>last_year   <span class="ot">=</span> <span class="fu">max</span>(who_yellowfever<span class="sc">$</span>year)</span>
+<span id="cb49-5"><a href="working-with-epidemiological-data.html#cb49-5" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="working-with-epidemiological-data.html#cb49-6" tabindex="-1"></a><span class="fu">glue</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">The dataframe contains yearly casedata for {n_countries} countries between {first_year} and {last_year}&quot;</span>)</span></code></pre></div>
 <pre><code>## The dataframe contains yearly casedata for 212 countries between 1974 and 2024</code></pre>
 </div>
 <div id="global-yearly-cases" class="section level4 hasAnchor" number="5.3.0.4">
 <h4><span class="header-section-number">5.3.0.4</span> Global yearly cases<a href="working-with-epidemiological-data.html#global-yearly-cases" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Let’s first get a global overview of YF in the world the past 50 years. To start with, we will create a graph showing the number of cases in the world per year, and then we’ll show it per continent to see which are the ones most affected.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="working-with-epidemiological-data.html#cb43-1" tabindex="-1"></a><span class="co"># Global epicurve</span></span>
-<span id="cb43-2"><a href="working-with-epidemiological-data.html#cb43-2" tabindex="-1"></a>global_yearly_casenumbers <span class="ot">&lt;-</span> who_yellowfever <span class="sc">%&gt;%</span></span>
-<span id="cb43-3"><a href="working-with-epidemiological-data.html#cb43-3" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
-<span id="cb43-4"><a href="working-with-epidemiological-data.html#cb43-4" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases))</span>
-<span id="cb43-5"><a href="working-with-epidemiological-data.html#cb43-5" tabindex="-1"></a></span>
-<span id="cb43-6"><a href="working-with-epidemiological-data.html#cb43-6" tabindex="-1"></a></span>
-<span id="cb43-7"><a href="working-with-epidemiological-data.html#cb43-7" tabindex="-1"></a><span class="fu">ggplot</span>(global_yearly_casenumbers) <span class="sc">+</span> </span>
-<span id="cb43-8"><a href="working-with-epidemiological-data.html#cb43-8" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;black&#39;</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span>  <span class="co"># black outline</span></span>
-<span id="cb43-9"><a href="working-with-epidemiological-data.html#cb43-9" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;#ffcc00&#39;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span>  <span class="co"># yellow line</span></span>
-<span id="cb43-10"><a href="working-with-epidemiological-data.html#cb43-10" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>(<span class="at">n =</span> <span class="dv">20</span>)) <span class="sc">+</span>                <span class="co"># I don&#39;t want a break per year. I do a max of 20 year</span></span>
-<span id="cb43-11"><a href="working-with-epidemiological-data.html#cb43-11" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">14</span>)  <span class="sc">+</span> </span>
-<span id="cb43-12"><a href="working-with-epidemiological-data.html#cb43-12" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb43-13"><a href="working-with-epidemiological-data.html#cb43-13" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb43-14"><a href="working-with-epidemiological-data.html#cb43-14" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Yellow Fever Cases in the world 1974 - 2024&quot;</span>,</span>
-<span id="cb43-15"><a href="working-with-epidemiological-data.html#cb43-15" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;number of cases reported to the WHO&quot;</span></span>
-<span id="cb43-16"><a href="working-with-epidemiological-data.html#cb43-16" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="working-with-epidemiological-data.html#cb51-1" tabindex="-1"></a><span class="co"># Global epicurve</span></span>
+<span id="cb51-2"><a href="working-with-epidemiological-data.html#cb51-2" tabindex="-1"></a>global_yearly_casenumbers <span class="ot">&lt;-</span> who_yellowfever <span class="sc">%&gt;%</span></span>
+<span id="cb51-3"><a href="working-with-epidemiological-data.html#cb51-3" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb51-4"><a href="working-with-epidemiological-data.html#cb51-4" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases))</span>
+<span id="cb51-5"><a href="working-with-epidemiological-data.html#cb51-5" tabindex="-1"></a></span>
+<span id="cb51-6"><a href="working-with-epidemiological-data.html#cb51-6" tabindex="-1"></a></span>
+<span id="cb51-7"><a href="working-with-epidemiological-data.html#cb51-7" tabindex="-1"></a><span class="fu">ggplot</span>(global_yearly_casenumbers) <span class="sc">+</span> </span>
+<span id="cb51-8"><a href="working-with-epidemiological-data.html#cb51-8" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;black&#39;</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span>  <span class="co"># black outline</span></span>
+<span id="cb51-9"><a href="working-with-epidemiological-data.html#cb51-9" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;#ffcc00&#39;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span>  <span class="co"># yellow line</span></span>
+<span id="cb51-10"><a href="working-with-epidemiological-data.html#cb51-10" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>(<span class="at">n =</span> <span class="dv">20</span>)) <span class="sc">+</span>                <span class="co"># I don&#39;t want a break per year. I do a max of 20 year</span></span>
+<span id="cb51-11"><a href="working-with-epidemiological-data.html#cb51-11" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">14</span>)  <span class="sc">+</span> </span>
+<span id="cb51-12"><a href="working-with-epidemiological-data.html#cb51-12" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb51-13"><a href="working-with-epidemiological-data.html#cb51-13" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb51-14"><a href="working-with-epidemiological-data.html#cb51-14" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Yellow Fever Cases in the world 1974 - 2024&quot;</span>,</span>
+<span id="cb51-15"><a href="working-with-epidemiological-data.html#cb51-15" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;number of cases reported to the WHO&quot;</span></span>
+<span id="cb51-16"><a href="working-with-epidemiological-data.html#cb51-16" tabindex="-1"></a>  )</span></code></pre></div>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-4-1.png" width="1440" style="display: block; margin: auto;" /></p>
 </div>
 <div id="yearly-cases-per-continent" class="section level4 hasAnchor" number="5.3.0.5">
 <h4><span class="header-section-number">5.3.0.5</span> Yearly cases per continent<a href="working-with-epidemiological-data.html#yearly-cases-per-continent" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="working-with-epidemiological-data.html#cb44-1" tabindex="-1"></a>yearly_casenumbers_continent <span class="ot">=</span> <span class="fu">merge</span>(who_yellowfever, countries_continents, <span class="at">by =</span> <span class="st">&quot;country&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb44-2"><a href="working-with-epidemiological-data.html#cb44-2" tabindex="-1"></a>  <span class="fu">group_by</span>(year, continent) <span class="sc">%&gt;%</span> </span>
-<span id="cb44-3"><a href="working-with-epidemiological-data.html#cb44-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb44-4"><a href="working-with-epidemiological-data.html#cb44-4" tabindex="-1"></a>  <span class="fu">filter</span>(continent <span class="sc">%in%</span> continents_list)</span>
-<span id="cb44-5"><a href="working-with-epidemiological-data.html#cb44-5" tabindex="-1"></a></span>
-<span id="cb44-6"><a href="working-with-epidemiological-data.html#cb44-6" tabindex="-1"></a><span class="fu">ggplot</span>(yearly_casenumbers_continent) <span class="sc">+</span> </span>
-<span id="cb44-7"><a href="working-with-epidemiological-data.html#cb44-7" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases, <span class="at">color =</span> continent), <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span> </span>
-<span id="cb44-8"><a href="working-with-epidemiological-data.html#cb44-8" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>(<span class="at">n =</span> <span class="dv">20</span>)) <span class="sc">+</span></span>
-<span id="cb44-9"><a href="working-with-epidemiological-data.html#cb44-9" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span> </span>
-<span id="cb44-10"><a href="working-with-epidemiological-data.html#cb44-10" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;Dark2&quot;</span>) <span class="sc">+</span>  <span class="co"># 7 distinct colors</span></span>
-<span id="cb44-11"><a href="working-with-epidemiological-data.html#cb44-11" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb44-12"><a href="working-with-epidemiological-data.html#cb44-12" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb44-13"><a href="working-with-epidemiological-data.html#cb44-13" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Yellow Fever Cases in the world 1973 - 2024 per continent&quot;</span>,</span>
-<span id="cb44-14"><a href="working-with-epidemiological-data.html#cb44-14" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;number of cases reported to the WHO&quot;</span></span>
-<span id="cb44-15"><a href="working-with-epidemiological-data.html#cb44-15" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb44-16"><a href="working-with-epidemiological-data.html#cb44-16" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="working-with-epidemiological-data.html#cb52-1" tabindex="-1"></a>yearly_casenumbers_continent <span class="ot">=</span> <span class="fu">merge</span>(who_yellowfever, countries_continents, <span class="at">by =</span> <span class="st">&quot;country&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-2"><a href="working-with-epidemiological-data.html#cb52-2" tabindex="-1"></a>  <span class="fu">group_by</span>(year, continent) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-3"><a href="working-with-epidemiological-data.html#cb52-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-4"><a href="working-with-epidemiological-data.html#cb52-4" tabindex="-1"></a>  <span class="fu">filter</span>(continent <span class="sc">%in%</span> continents_list)</span>
+<span id="cb52-5"><a href="working-with-epidemiological-data.html#cb52-5" tabindex="-1"></a></span>
+<span id="cb52-6"><a href="working-with-epidemiological-data.html#cb52-6" tabindex="-1"></a><span class="fu">ggplot</span>(yearly_casenumbers_continent) <span class="sc">+</span> </span>
+<span id="cb52-7"><a href="working-with-epidemiological-data.html#cb52-7" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases, <span class="at">color =</span> continent), <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span> </span>
+<span id="cb52-8"><a href="working-with-epidemiological-data.html#cb52-8" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>(<span class="at">n =</span> <span class="dv">20</span>)) <span class="sc">+</span></span>
+<span id="cb52-9"><a href="working-with-epidemiological-data.html#cb52-9" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span> </span>
+<span id="cb52-10"><a href="working-with-epidemiological-data.html#cb52-10" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;Dark2&quot;</span>) <span class="sc">+</span>  <span class="co"># 7 distinct colors</span></span>
+<span id="cb52-11"><a href="working-with-epidemiological-data.html#cb52-11" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb52-12"><a href="working-with-epidemiological-data.html#cb52-12" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb52-13"><a href="working-with-epidemiological-data.html#cb52-13" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Yellow Fever Cases in the world 1973 - 2024 per continent&quot;</span>,</span>
+<span id="cb52-14"><a href="working-with-epidemiological-data.html#cb52-14" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;number of cases reported to the WHO&quot;</span></span>
+<span id="cb52-15"><a href="working-with-epidemiological-data.html#cb52-15" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb52-16"><a href="working-with-epidemiological-data.html#cb52-16" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-5-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>We can clearly tell that since 1974, Africa has experienced the largest burden by YF, though South America suffered between 2016 and 2019 as well. Let’s have a look at the total sum of cases per country in the past, to see which countries and which areas are affected the most.</p>
 </div>
 <div id="historical-burden" class="section level4 hasAnchor" number="5.3.0.6">
 <h4><span class="header-section-number">5.3.0.6</span> Historical burden<a href="working-with-epidemiological-data.html#historical-burden" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="working-with-epidemiological-data.html#cb45-1" tabindex="-1"></a>cases_per_country <span class="ot">=</span> who_yellowfever<span class="sc">%&gt;%</span> </span>
-<span id="cb45-2"><a href="working-with-epidemiological-data.html#cb45-2" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">%&gt;%</span></span>
-<span id="cb45-3"><a href="working-with-epidemiological-data.html#cb45-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases))</span>
-<span id="cb45-4"><a href="working-with-epidemiological-data.html#cb45-4" tabindex="-1"></a></span>
-<span id="cb45-5"><a href="working-with-epidemiological-data.html#cb45-5" tabindex="-1"></a>mapdata <span class="ot">=</span> <span class="fu">st_as_sf</span>(<span class="fu">merge</span>(cases_per_country, world_shapefile, <span class="at">on =</span> <span class="st">&#39;country&#39;</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb45-6"><a href="working-with-epidemiological-data.html#cb45-6" tabindex="-1"></a></span>
-<span id="cb45-7"><a href="working-with-epidemiological-data.html#cb45-7" tabindex="-1"></a></span>
-<span id="cb45-8"><a href="working-with-epidemiological-data.html#cb45-8" tabindex="-1"></a>mapdata<span class="sc">$</span>cases_category <span class="ot">&lt;-</span> <span class="fu">cut</span>(</span>
-<span id="cb45-9"><a href="working-with-epidemiological-data.html#cb45-9" tabindex="-1"></a>  mapdata<span class="sc">$</span>cases,</span>
-<span id="cb45-10"><a href="working-with-epidemiological-data.html#cb45-10" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">1000</span>, <span class="dv">2000</span>, <span class="dv">5000</span>, <span class="dv">10000</span>, <span class="dv">20000</span>, <span class="cn">Inf</span>),  <span class="co"># 8 breaks → 7 intervals</span></span>
-<span id="cb45-11"><a href="working-with-epidemiological-data.html#cb45-11" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;0 - 100&quot;</span>, <span class="st">&quot;101-500&quot;</span>,<span class="st">&quot;501-1000&quot;</span>,     <span class="st">&quot;1001-2000&quot;</span>,   <span class="st">&quot;2001-5000&quot;</span>,    <span class="st">&quot;5001-10000&quot;</span>,  <span class="st">&quot;10001-20000&quot;</span>,  <span class="st">&quot;&gt;20000&quot;</span>),</span>
-<span id="cb45-12"><a href="working-with-epidemiological-data.html#cb45-12" tabindex="-1"></a>  <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
-<span id="cb45-13"><a href="working-with-epidemiological-data.html#cb45-13" tabindex="-1"></a>)</span>
-<span id="cb45-14"><a href="working-with-epidemiological-data.html#cb45-14" tabindex="-1"></a></span>
-<span id="cb45-15"><a href="working-with-epidemiological-data.html#cb45-15" tabindex="-1"></a></span>
-<span id="cb45-16"><a href="working-with-epidemiological-data.html#cb45-16" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mapdata) <span class="sc">+</span></span>
-<span id="cb45-17"><a href="working-with-epidemiological-data.html#cb45-17" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> cases_category), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb45-18"><a href="working-with-epidemiological-data.html#cb45-18" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;YlOrRd&quot;</span>, <span class="at">na.value =</span> <span class="st">&quot;gray95&quot;</span>, <span class="at">name =</span> <span class="st">&quot;Cases&quot;</span>) <span class="sc">+</span></span>
-<span id="cb45-19"><a href="working-with-epidemiological-data.html#cb45-19" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
-<span id="cb45-20"><a href="working-with-epidemiological-data.html#cb45-20" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
-<span id="cb45-21"><a href="working-with-epidemiological-data.html#cb45-21" tabindex="-1"></a>      <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">&quot;#E0FFFF&quot;</span>),  <span class="co"># clean light background</span></span>
-<span id="cb45-22"><a href="working-with-epidemiological-data.html#cb45-22" tabindex="-1"></a>      <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span>,</span>
-<span id="cb45-23"><a href="working-with-epidemiological-data.html#cb45-23" tabindex="-1"></a>      <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
-<span id="cb45-24"><a href="working-with-epidemiological-data.html#cb45-24" tabindex="-1"></a>      <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)</span>
-<span id="cb45-25"><a href="working-with-epidemiological-data.html#cb45-25" tabindex="-1"></a>    ) <span class="sc">+</span> </span>
-<span id="cb45-26"><a href="working-with-epidemiological-data.html#cb45-26" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Cumulative cases 1974 - 2024&#39;</span>)</span>
-<span id="cb45-27"><a href="working-with-epidemiological-data.html#cb45-27" tabindex="-1"></a></span>
-<span id="cb45-28"><a href="working-with-epidemiological-data.html#cb45-28" tabindex="-1"></a>pl</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="working-with-epidemiological-data.html#cb53-1" tabindex="-1"></a>cases_per_country <span class="ot">=</span> who_yellowfever<span class="sc">%&gt;%</span> </span>
+<span id="cb53-2"><a href="working-with-epidemiological-data.html#cb53-2" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">%&gt;%</span></span>
+<span id="cb53-3"><a href="working-with-epidemiological-data.html#cb53-3" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cases =</span> <span class="fu">sum</span>(cases))</span>
+<span id="cb53-4"><a href="working-with-epidemiological-data.html#cb53-4" tabindex="-1"></a></span>
+<span id="cb53-5"><a href="working-with-epidemiological-data.html#cb53-5" tabindex="-1"></a>mapdata <span class="ot">=</span> <span class="fu">st_as_sf</span>(<span class="fu">merge</span>(cases_per_country, world_shapefile, <span class="at">on =</span> <span class="st">&#39;country&#39;</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb53-6"><a href="working-with-epidemiological-data.html#cb53-6" tabindex="-1"></a></span>
+<span id="cb53-7"><a href="working-with-epidemiological-data.html#cb53-7" tabindex="-1"></a></span>
+<span id="cb53-8"><a href="working-with-epidemiological-data.html#cb53-8" tabindex="-1"></a>mapdata<span class="sc">$</span>cases_category <span class="ot">&lt;-</span> <span class="fu">cut</span>(</span>
+<span id="cb53-9"><a href="working-with-epidemiological-data.html#cb53-9" tabindex="-1"></a>  mapdata<span class="sc">$</span>cases,</span>
+<span id="cb53-10"><a href="working-with-epidemiological-data.html#cb53-10" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">1000</span>, <span class="dv">2000</span>, <span class="dv">5000</span>, <span class="dv">10000</span>, <span class="dv">20000</span>, <span class="cn">Inf</span>),  <span class="co"># 8 breaks → 7 intervals</span></span>
+<span id="cb53-11"><a href="working-with-epidemiological-data.html#cb53-11" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;0 - 100&quot;</span>, <span class="st">&quot;101-500&quot;</span>,<span class="st">&quot;501-1000&quot;</span>,     <span class="st">&quot;1001-2000&quot;</span>,   <span class="st">&quot;2001-5000&quot;</span>,    <span class="st">&quot;5001-10000&quot;</span>,  <span class="st">&quot;10001-20000&quot;</span>,  <span class="st">&quot;&gt;20000&quot;</span>),</span>
+<span id="cb53-12"><a href="working-with-epidemiological-data.html#cb53-12" tabindex="-1"></a>  <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
+<span id="cb53-13"><a href="working-with-epidemiological-data.html#cb53-13" tabindex="-1"></a>)</span>
+<span id="cb53-14"><a href="working-with-epidemiological-data.html#cb53-14" tabindex="-1"></a></span>
+<span id="cb53-15"><a href="working-with-epidemiological-data.html#cb53-15" tabindex="-1"></a></span>
+<span id="cb53-16"><a href="working-with-epidemiological-data.html#cb53-16" tabindex="-1"></a>pl <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mapdata) <span class="sc">+</span></span>
+<span id="cb53-17"><a href="working-with-epidemiological-data.html#cb53-17" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> cases_category), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb53-18"><a href="working-with-epidemiological-data.html#cb53-18" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">&quot;YlOrRd&quot;</span>, <span class="at">na.value =</span> <span class="st">&quot;gray95&quot;</span>, <span class="at">name =</span> <span class="st">&quot;Cases&quot;</span>) <span class="sc">+</span></span>
+<span id="cb53-19"><a href="working-with-epidemiological-data.html#cb53-19" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb53-20"><a href="working-with-epidemiological-data.html#cb53-20" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb53-21"><a href="working-with-epidemiological-data.html#cb53-21" tabindex="-1"></a>      <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">&quot;#E0FFFF&quot;</span>),  <span class="co"># clean light background</span></span>
+<span id="cb53-22"><a href="working-with-epidemiological-data.html#cb53-22" tabindex="-1"></a>      <span class="at">legend.position =</span> <span class="st">&quot;right&quot;</span>,</span>
+<span id="cb53-23"><a href="working-with-epidemiological-data.html#cb53-23" tabindex="-1"></a>      <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb53-24"><a href="working-with-epidemiological-data.html#cb53-24" tabindex="-1"></a>      <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)</span>
+<span id="cb53-25"><a href="working-with-epidemiological-data.html#cb53-25" tabindex="-1"></a>    ) <span class="sc">+</span> </span>
+<span id="cb53-26"><a href="working-with-epidemiological-data.html#cb53-26" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Cumulative cases 1974 - 2024&#39;</span>)</span>
+<span id="cb53-27"><a href="working-with-epidemiological-data.html#cb53-27" tabindex="-1"></a></span>
+<span id="cb53-28"><a href="working-with-epidemiological-data.html#cb53-28" tabindex="-1"></a>pl</span></code></pre></div>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-6-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>From this we can clearly see that the most affected regions are central and west Africa, as well as central(?) Latin America. This does not allow us to look into temporal dynamics though, so let’s look a bit further into that using a function.</p>
 </div>
 <div id="country-specific-epicurves" class="section level4 hasAnchor" number="5.3.0.7">
 <h4><span class="header-section-number">5.3.0.7</span> Country-specific epicurves<a href="working-with-epidemiological-data.html#country-specific-epicurves" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="working-with-epidemiological-data.html#cb46-1" tabindex="-1"></a>plot_country <span class="ot">=</span> <span class="cf">function</span>(country_filter){</span>
-<span id="cb46-2"><a href="working-with-epidemiological-data.html#cb46-2" tabindex="-1"></a>  </span>
-<span id="cb46-3"><a href="working-with-epidemiological-data.html#cb46-3" tabindex="-1"></a>  filtered_df <span class="ot">&lt;-</span> who_yellowfever <span class="sc">%&gt;%</span> <span class="fu">filter</span>(country <span class="sc">==</span> country_filter)</span>
-<span id="cb46-4"><a href="working-with-epidemiological-data.html#cb46-4" tabindex="-1"></a></span>
-<span id="cb46-5"><a href="working-with-epidemiological-data.html#cb46-5" tabindex="-1"></a>  pl <span class="ot">=</span> <span class="fu">ggplot</span>(filtered_df) <span class="sc">+</span> </span>
-<span id="cb46-6"><a href="working-with-epidemiological-data.html#cb46-6" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;black&#39;</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span>  <span class="co"># black outline</span></span>
-<span id="cb46-7"><a href="working-with-epidemiological-data.html#cb46-7" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;#ffcc00&#39;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span>  <span class="co"># yellow line</span></span>
-<span id="cb46-8"><a href="working-with-epidemiological-data.html#cb46-8" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;black&#39;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span>  <span class="co"># black outline</span></span>
-<span id="cb46-9"><a href="working-with-epidemiological-data.html#cb46-9" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>(<span class="at">n =</span> <span class="dv">20</span>)) <span class="sc">+</span></span>
-<span id="cb46-10"><a href="working-with-epidemiological-data.html#cb46-10" tabindex="-1"></a>      <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">14</span>)  <span class="sc">+</span> </span>
-<span id="cb46-11"><a href="working-with-epidemiological-data.html#cb46-11" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y=</span><span class="st">&#39;cases&#39;</span>) <span class="sc">+</span></span>
-<span id="cb46-12"><a href="working-with-epidemiological-data.html#cb46-12" tabindex="-1"></a>      <span class="fu">labs</span>(</span>
-<span id="cb46-13"><a href="working-with-epidemiological-data.html#cb46-13" tabindex="-1"></a>      <span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">&quot;Yellow Fever Cases in &quot;</span>, country_filter,  <span class="st">&quot; 1973 - 2024&quot;</span>),</span>
-<span id="cb46-14"><a href="working-with-epidemiological-data.html#cb46-14" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="st">&quot;number of cases reported to the WHO&quot;</span></span>
-<span id="cb46-15"><a href="working-with-epidemiological-data.html#cb46-15" tabindex="-1"></a>    )</span>
-<span id="cb46-16"><a href="working-with-epidemiological-data.html#cb46-16" tabindex="-1"></a>  </span>
-<span id="cb46-17"><a href="working-with-epidemiological-data.html#cb46-17" tabindex="-1"></a>  <span class="fu">return</span>(pl)</span>
-<span id="cb46-18"><a href="working-with-epidemiological-data.html#cb46-18" tabindex="-1"></a>  </span>
-<span id="cb46-19"><a href="working-with-epidemiological-data.html#cb46-19" tabindex="-1"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="working-with-epidemiological-data.html#cb47-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Dem. Rep. Congo&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="working-with-epidemiological-data.html#cb54-1" tabindex="-1"></a>plot_country <span class="ot">=</span> <span class="cf">function</span>(country_filter){</span>
+<span id="cb54-2"><a href="working-with-epidemiological-data.html#cb54-2" tabindex="-1"></a>  </span>
+<span id="cb54-3"><a href="working-with-epidemiological-data.html#cb54-3" tabindex="-1"></a>  filtered_df <span class="ot">&lt;-</span> who_yellowfever <span class="sc">%&gt;%</span> <span class="fu">filter</span>(country <span class="sc">==</span> country_filter)</span>
+<span id="cb54-4"><a href="working-with-epidemiological-data.html#cb54-4" tabindex="-1"></a></span>
+<span id="cb54-5"><a href="working-with-epidemiological-data.html#cb54-5" tabindex="-1"></a>  pl <span class="ot">=</span> <span class="fu">ggplot</span>(filtered_df) <span class="sc">+</span> </span>
+<span id="cb54-6"><a href="working-with-epidemiological-data.html#cb54-6" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;black&#39;</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span>  <span class="co"># black outline</span></span>
+<span id="cb54-7"><a href="working-with-epidemiological-data.html#cb54-7" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;#ffcc00&#39;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span>  <span class="co"># yellow line</span></span>
+<span id="cb54-8"><a href="working-with-epidemiological-data.html#cb54-8" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> cases), <span class="at">color =</span> <span class="st">&#39;black&#39;</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span>  <span class="co"># black outline</span></span>
+<span id="cb54-9"><a href="working-with-epidemiological-data.html#cb54-9" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>(<span class="at">n =</span> <span class="dv">20</span>)) <span class="sc">+</span></span>
+<span id="cb54-10"><a href="working-with-epidemiological-data.html#cb54-10" tabindex="-1"></a>      <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">14</span>)  <span class="sc">+</span> </span>
+<span id="cb54-11"><a href="working-with-epidemiological-data.html#cb54-11" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y=</span><span class="st">&#39;cases&#39;</span>) <span class="sc">+</span></span>
+<span id="cb54-12"><a href="working-with-epidemiological-data.html#cb54-12" tabindex="-1"></a>      <span class="fu">labs</span>(</span>
+<span id="cb54-13"><a href="working-with-epidemiological-data.html#cb54-13" tabindex="-1"></a>      <span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">&quot;Yellow Fever Cases in &quot;</span>, country_filter,  <span class="st">&quot; 1973 - 2024&quot;</span>),</span>
+<span id="cb54-14"><a href="working-with-epidemiological-data.html#cb54-14" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="st">&quot;number of cases reported to the WHO&quot;</span></span>
+<span id="cb54-15"><a href="working-with-epidemiological-data.html#cb54-15" tabindex="-1"></a>    )</span>
+<span id="cb54-16"><a href="working-with-epidemiological-data.html#cb54-16" tabindex="-1"></a>  </span>
+<span id="cb54-17"><a href="working-with-epidemiological-data.html#cb54-17" tabindex="-1"></a>  <span class="fu">return</span>(pl)</span>
+<span id="cb54-18"><a href="working-with-epidemiological-data.html#cb54-18" tabindex="-1"></a>  </span>
+<span id="cb54-19"><a href="working-with-epidemiological-data.html#cb54-19" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="working-with-epidemiological-data.html#cb55-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Dem. Rep. Congo&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in geom_point(aes(x = year, y = cases), color = &quot;black&quot;, linewidth =
 ## 1): Ignoring unknown parameters: `linewidth`</code></pre>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-8-1.png" width="1440" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="working-with-epidemiological-data.html#cb49-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Chad&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="working-with-epidemiological-data.html#cb57-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Chad&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in geom_point(aes(x = year, y = cases), color = &quot;black&quot;, linewidth =
 ## 1): Ignoring unknown parameters: `linewidth`</code></pre>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-8-2.png" width="1440" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="working-with-epidemiological-data.html#cb51-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Nigeria&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="working-with-epidemiological-data.html#cb59-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Nigeria&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in geom_point(aes(x = year, y = cases), color = &quot;black&quot;, linewidth =
 ## 1): Ignoring unknown parameters: `linewidth`</code></pre>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-8-3.png" width="1440" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="working-with-epidemiological-data.html#cb53-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Ghana&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="working-with-epidemiological-data.html#cb61-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Ghana&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in geom_point(aes(x = year, y = cases), color = &quot;black&quot;, linewidth =
 ## 1): Ignoring unknown parameters: `linewidth`</code></pre>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-8-4.png" width="1440" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="working-with-epidemiological-data.html#cb55-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Brazil&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="working-with-epidemiological-data.html#cb63-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Brazil&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in geom_point(aes(x = year, y = cases), color = &quot;black&quot;, linewidth =
 ## 1): Ignoring unknown parameters: `linewidth`</code></pre>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-8-5.png" width="1440" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="working-with-epidemiological-data.html#cb57-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Peru&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="working-with-epidemiological-data.html#cb65-1" tabindex="-1"></a><span class="fu">plot_country</span>(<span class="st">&quot;Peru&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning in geom_point(aes(x = year, y = cases), color = &quot;black&quot;, linewidth =
 ## 1): Ignoring unknown parameters: `linewidth`</code></pre>
 <p><img src="05-working-with-epidemiological-data_files/figure-html/unnamed-chunk-8-6.png" width="1440" style="display: block; margin: auto;" />

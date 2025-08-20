@@ -8,8 +8,8 @@ troubleshooting
 data-structures
 writing-scripts
 tidyverse
+wide-and-tidy-data
 data-wrangling-using-dplyr
-tidy-functions
 data-visualization-using-ggplot
 working-with-epidemiological-data
 acessing-data
