@@ -1,86 +1,93 @@
-# Tidyverse
+# Introduction to the Tidyverse
 
-The collection tidyverse includes some of the most widely used packages in R. Representing a collection of packages used for data cleaning, processing and visualization, every person familiar with R should know these packages! In this chapter we will be focussing on the implementation of the functions that make up the tidyverse, with a particular interest to data manipulation and visualization.
+The **tidyverse** is a collection of R packages designed for data science that share an underlying design philosophy, grammar, and data structures. These packages are essential tools for anyone working with data in R, providing intuitive and consistent functions for data cleaning, manipulation, and visualization.
 
-The packages in tidyverse work on dataframes which we saw in the previous chapter. In particular, the tidyverse is made for **tidy**-dataframes. Following Wickman's philosophy, a tidy dataframe is one with the following features:
+The tidyverse follows Hadley Wickham's philosophy of **tidy data**, where:
 
-- each variable is a column
-- each observation is a row
-- each value is a cell
+- Each variable is a column
+- Each observation is a row  
+- Each value is a cell
 
-
-## Wide and tidy data
-
-Let’s go through an example together. Is the following table a tidy dataframe?
+This structure makes data analysis more intuitive and efficient.
 
 
 ```r
-# Column-wise matrix: male_cases, female_cases, year
-flu_cases <- matrix(
-  c(120, 150,   # male_cases
-    100, 130,   # female_cases
-    2020, 2021),# year
-  nrow = 2,
-  ncol = 3,
-  byrow = FALSE   # fill column-wise
+library(tidyverse)  # Loads core tidyverse packages
+```
+
+```
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+## ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+## ✔ purrr     1.0.2     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+```r
+library(gapminder)  # Example dataset
+```
+
+## Data Structure: Wide vs. Tidy Data
+
+### Understanding the Difference
+
+Let's explore the concept of tidy data with a practical example:
+
+
+```r
+# Create a wide-format dataset
+flu_cases <- data.frame(
+  year = c(2020, 2021),
+  male_cases = c(120, 150),
+  female_cases = c(100, 130)
 )
 
-# Add column names
-colnames(flu_cases) <- c("male_cases", "female_cases", "year")
+print("Wide format (not tidy):")
+```
 
-flu_cases <- data.frame(flu_cases)
+```
+## [1] "Wide format (not tidy):"
+```
+
+```r
 flu_cases
 ```
 
 ```
-##   male_cases female_cases year
-## 1        120          100 2020
-## 2        150          130 2021
+##   year male_cases female_cases
+## 1 2020        120          100
+## 2 2021        150          130
 ```
 
-The answer is no!
-Here, the variable sex is stored inside the column names instead of as a proper column.
+**Why isn't this tidy?** The variable "sex" is encoded in the column names rather than being a proper column with values.
 
-The tidyverse provides two key functions in the tidyr package to reshape data:
+### Reshaping Data with tidyr
 
-- `pivot_longer()` → makes data longer (good for tidy analysis, many rows, fewer columns)
-- `pivot_wider()` → makes data wider (the opposite transformation, more columns, fewer rows)
+#### Making Data Longer with `pivot_longer()`
 
-**pivot_longer**
-
-We can reshape our flu data into a tidy format:
-
-```r
-library(tidyr)
-library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
 
 ```r
 flu_tidy <- flu_cases %>%
   pivot_longer(
-    cols = c(male_cases, female_cases),
-    names_to = "sex",
-    values_to = "cases"
+    cols = c(male_cases, female_cases),     # Columns to pivot
+    names_to = "sex",                       # New column for variable names
+    values_to = "cases"                     # New column for values
   ) %>%
-  mutate(sex = ifelse(sex == "male_cases", "male", "female"))
+  mutate(sex = str_replace(sex, "_cases", ""))  # Clean up the sex values
 
+print("Tidy format (long):")
+```
+
+```
+## [1] "Tidy format (long):"
+```
+
+```r
 flu_tidy
 ```
 
@@ -93,21 +100,26 @@ flu_tidy
 ## 3  2021 male     150
 ## 4  2021 female   130
 ```
-Now indeed each variable (year, sex, cases) has its own column.
-Tidy tables tend to be long, not wide — which is exactly what tidyverse functions expect.
 
-**pivot_wider**
+#### Making Data Wider with `pivot_wider()`
 
-We can also go back to wide format:
 
 ```r
 flu_wide_again <- flu_tidy %>%
   pivot_wider(
-    names_from = sex,
-    values_from = cases,
-    names_glue = "{sex}_cases"
+    names_from = sex,           # Column to get new column names from
+    values_from = cases,        # Column to get values from
+    names_glue = "{sex}_cases"  # Template for new column names
   )
 
+print("Back to wide format:")
+```
+
+```
+## [1] "Back to wide format:"
+```
+
+```r
 flu_wide_again
 ```
 
@@ -118,65 +130,111 @@ flu_wide_again
 ## 1  2020        120          100
 ## 2  2021        150          130
 ```
-Now we are back to the original table, where sex is encoded in the column names.
 
+## Core dplyr Functions for Data Manipulation
 
-## Data wrangling using dplyr
-
-There's loads of functions within tidyverse. We will go through a couple of them together, using one of the default datasets in R, namely gapminder. This includes yearly observations per country in the world, of many variables as you'll see. Then we'll use what we learned on an epidemiological dataset to figure out the source of an outbreak!
-
-
-```r
-library(gapminder)
-head(gapminder)
-```
-
-```
-## # A tibble: 6 × 6
-##   country     continent  year lifeExp      pop gdpPercap
-##   <fct>       <fct>     <int>   <dbl>    <int>     <dbl>
-## 1 Afghanistan Asia       1952    28.8  8425333      779.
-## 2 Afghanistan Asia       1957    30.3  9240934      821.
-## 3 Afghanistan Asia       1962    32.0 10267083      853.
-## 4 Afghanistan Asia       1967    34.0 11537966      836.
-## 5 Afghanistan Asia       1972    36.1 13079460      740.
-## 6 Afghanistan Asia       1977    38.4 14880372      786.
-```
-
-**pipeline-operator**
-
-We connect different tidyverse functions using a so called pipeline operator: `%>%`. We can write it like:
-`new_dataframe = old_dataframe %>% tidyverse_function`
-
-**select**
-
-Using the function `select()` we select specific column names
+Let's explore the essential dplyr functions using the gapminder dataset:
 
 
 ```r
-selected_columns = gapminder %>% select(country, year, lifeExp)
+head(gapminder, 10)
+```
+
+```
+## # A tibble: 10 × 6
+##    country     continent  year lifeExp      pop gdpPercap
+##    <fct>       <fct>     <int>   <dbl>    <int>     <dbl>
+##  1 Afghanistan Asia       1952    28.8  8425333      779.
+##  2 Afghanistan Asia       1957    30.3  9240934      821.
+##  3 Afghanistan Asia       1962    32.0 10267083      853.
+##  4 Afghanistan Asia       1967    34.0 11537966      836.
+##  5 Afghanistan Asia       1972    36.1 13079460      740.
+##  6 Afghanistan Asia       1977    38.4 14880372      786.
+##  7 Afghanistan Asia       1982    39.9 12881816      978.
+##  8 Afghanistan Asia       1987    40.8 13867957      852.
+##  9 Afghanistan Asia       1992    41.7 16317921      649.
+## 10 Afghanistan Asia       1997    41.8 22227415      635.
+```
+
+### The Pipe Operator (`%>%`)
+
+The pipe operator is the backbone of tidyverse workflows. It passes the result of one function as the first argument to the next function:
+
+
+```r
+# Instead of: function_c(function_b(function_a(data), arg1), arg2)
+# We write: data %>% function_a() %>% function_b(arg1) %>% function_c(arg2)
+```
+
+### `select()`: Choose Columns
+
+
+```r
+# Select specific columns
+selected_columns <- gapminder %>% 
+  select(country, year, lifeExp, pop)
+
 head(selected_columns)
 ```
 
 ```
-## # A tibble: 6 × 3
-##   country      year lifeExp
-##   <fct>       <int>   <dbl>
-## 1 Afghanistan  1952    28.8
-## 2 Afghanistan  1957    30.3
-## 3 Afghanistan  1962    32.0
-## 4 Afghanistan  1967    34.0
-## 5 Afghanistan  1972    36.1
-## 6 Afghanistan  1977    38.4
+## # A tibble: 6 × 4
+##   country      year lifeExp      pop
+##   <fct>       <int>   <dbl>    <int>
+## 1 Afghanistan  1952    28.8  8425333
+## 2 Afghanistan  1957    30.3  9240934
+## 3 Afghanistan  1962    32.0 10267083
+## 4 Afghanistan  1967    34.0 11537966
+## 5 Afghanistan  1972    36.1 13079460
+## 6 Afghanistan  1977    38.4 14880372
 ```
 
-**filter**
+```r
+# Select columns by pattern
+gapminder %>% 
+  select(country, starts_with("life")) %>% 
+  head()
+```
 
-The filter function is a very powerful function that allows us to only keep the rows in our dataframe that fulfill a certain condition. See chapter ... for more conditional logic in R, but here's a couple of examples
+```
+## # A tibble: 6 × 2
+##   country     lifeExp
+##   <fct>         <dbl>
+## 1 Afghanistan    28.8
+## 2 Afghanistan    30.3
+## 3 Afghanistan    32.0
+## 4 Afghanistan    34.0
+## 5 Afghanistan    36.1
+## 6 Afghanistan    38.4
+```
+
+```r
+# Select everything except certain columns
+gapminder %>% 
+  select(-continent, -gdpPercap) %>% 
+  head()
+```
+
+```
+## # A tibble: 6 × 4
+##   country      year lifeExp      pop
+##   <fct>       <int>   <dbl>    <int>
+## 1 Afghanistan  1952    28.8  8425333
+## 2 Afghanistan  1957    30.3  9240934
+## 3 Afghanistan  1962    32.0 10267083
+## 4 Afghanistan  1967    34.0 11537966
+## 5 Afghanistan  1972    36.1 13079460
+## 6 Afghanistan  1977    38.4 14880372
+```
+
+### `filter()`: Choose Rows
 
 
 ```r
-head(gapminder %>% filter(year == 2007))
+# Filter by exact match
+gapminder %>% 
+  filter(year == 2007) %>% 
+  head()
 ```
 
 ```
@@ -192,7 +250,29 @@ head(gapminder %>% filter(year == 2007))
 ```
 
 ```r
-head(gapminder %>% filter(continent %in% c('Oceania', 'Africa')))
+# Filter by multiple conditions
+gapminder %>% 
+  filter(year == 2007, continent == "Europe") %>% 
+  head()
+```
+
+```
+## # A tibble: 6 × 6
+##   country                continent  year lifeExp      pop gdpPercap
+##   <fct>                  <fct>     <int>   <dbl>    <int>     <dbl>
+## 1 Albania                Europe     2007    76.4  3600523     5937.
+## 2 Austria                Europe     2007    79.8  8199783    36126.
+## 3 Belgium                Europe     2007    79.4 10392226    33693.
+## 4 Bosnia and Herzegovina Europe     2007    74.9  4552198     7446.
+## 5 Bulgaria               Europe     2007    73.0  7322858    10681.
+## 6 Croatia                Europe     2007    75.7  4493312    14619.
+```
+
+```r
+# Filter using %in% operator
+gapminder %>% 
+  filter(continent %in% c('Oceania', 'Africa')) %>% 
+  head()
 ```
 
 ```
@@ -208,183 +288,157 @@ head(gapminder %>% filter(continent %in% c('Oceania', 'Africa')))
 ```
 
 ```r
-head(gapminder %>% filter(pop > 100000000))
+# Filter by numeric conditions
+gapminder %>% 
+  filter(pop > 100000000, lifeExp > 70) %>% 
+  head()
 ```
 
 ```
 ## # A tibble: 6 × 6
-##   country    continent  year lifeExp       pop gdpPercap
-##   <fct>      <fct>     <int>   <dbl>     <int>     <dbl>
-## 1 Bangladesh Asia       1987    52.8 103764241      752.
-## 2 Bangladesh Asia       1992    56.0 113704579      838.
-## 3 Bangladesh Asia       1997    59.4 123315288      973.
-## 4 Bangladesh Asia       2002    62.0 135656790     1136.
-## 5 Bangladesh Asia       2007    64.1 150448339     1391.
-## 6 Brazil     Americas   1972    59.5 100840058     4986.
+##   country   continent  year lifeExp        pop gdpPercap
+##   <fct>     <fct>     <int>   <dbl>      <int>     <dbl>
+## 1 Brazil    Americas   2002    71.0  179914212     8131.
+## 2 Brazil    Americas   2007    72.4  190010647     9066.
+## 3 China     Asia       1997    70.4 1230075000     2289.
+## 4 China     Asia       2002    72.0 1280400000     3119.
+## 5 China     Asia       2007    73.0 1318683096     4959.
+## 6 Indonesia Asia       2007    70.6  223547000     3541.
 ```
 
-
-**mutate**
-
-This is another very powerful and useful function. With mutate, we can change values in a dataframe. We can even change values in a dataframe that fulfill a certain condition. We do this by 
-`mutate(column_name = ...)`
-
-if column_name doesn't exist in the dataframe yet, a new column with this name is created.
+### `mutate()`: Create or Modify Columns
 
 
 ```r
-gapminder_pop_log = gapminder %>% mutate(pop_log = log(pop))
-gapminder_pop_log
+# Create new columns
+gapminder_enhanced <- gapminder %>%
+  mutate(
+    pop_millions = pop / 1000000,
+    gdp_total = pop * gdpPercap,
+    pop_log = log10(pop)
+  )
+
+head(gapminder_enhanced)
 ```
 
 ```
-## # A tibble: 1,704 × 7
-##    country     continent  year lifeExp      pop gdpPercap pop_log
-##    <fct>       <fct>     <int>   <dbl>    <int>     <dbl>   <dbl>
-##  1 Afghanistan Asia       1952    28.8  8425333      779.    15.9
-##  2 Afghanistan Asia       1957    30.3  9240934      821.    16.0
-##  3 Afghanistan Asia       1962    32.0 10267083      853.    16.1
-##  4 Afghanistan Asia       1967    34.0 11537966      836.    16.3
-##  5 Afghanistan Asia       1972    36.1 13079460      740.    16.4
-##  6 Afghanistan Asia       1977    38.4 14880372      786.    16.5
-##  7 Afghanistan Asia       1982    39.9 12881816      978.    16.4
-##  8 Afghanistan Asia       1987    40.8 13867957      852.    16.4
-##  9 Afghanistan Asia       1992    41.7 16317921      649.    16.6
-## 10 Afghanistan Asia       1997    41.8 22227415      635.    16.9
-## # ℹ 1,694 more rows
+## # A tibble: 6 × 9
+##   country     continent  year lifeExp      pop gdpPercap pop_millions  gdp_total
+##   <fct>       <fct>     <int>   <dbl>    <int>     <dbl>        <dbl>      <dbl>
+## 1 Afghanistan Asia       1952    28.8  8425333      779.         8.43    6.57e 9
+## 2 Afghanistan Asia       1957    30.3  9240934      821.         9.24    7.59e 9
+## 3 Afghanistan Asia       1962    32.0 10267083      853.        10.3     8.76e 9
+## 4 Afghanistan Asia       1967    34.0 11537966      836.        11.5     9.65e 9
+## 5 Afghanistan Asia       1972    36.1 13079460      740.        13.1     9.68e 9
+## 6 Afghanistan Asia       1977    38.4 14880372      786.        14.9     1.17e10
+## # ℹ 1 more variable: pop_log <dbl>
 ```
 
 ```r
-# some case_when functionality...
+# Conditional mutations with ifelse
+gapminder %>%
+  mutate(
+    pop_category = ifelse(pop > 50000000, "Large", "Small")
+  ) %>%
+  head()
 ```
 
-**Transmutate**
+```
+## # A tibble: 6 × 7
+##   country     continent  year lifeExp      pop gdpPercap pop_category
+##   <fct>       <fct>     <int>   <dbl>    <int>     <dbl> <chr>       
+## 1 Afghanistan Asia       1952    28.8  8425333      779. Small       
+## 2 Afghanistan Asia       1957    30.3  9240934      821. Small       
+## 3 Afghanistan Asia       1962    32.0 10267083      853. Small       
+## 4 Afghanistan Asia       1967    34.0 11537966      836. Small       
+## 5 Afghanistan Asia       1972    36.1 13079460      740. Small       
+## 6 Afghanistan Asia       1977    38.4 14880372      786. Small
+```
 
-The function `transmutate()` does the same as `mutate()`, with the only difference being that exclusively the changed column is selected. Thus, `transmutate()` is a basically a combination of `mutate %>% select`.
-
-
-**Arrange**
-
-The function `arrange()` does not actually change anything inside of hte dataframe, but only adjusts the order in which we see it. Based on one or more columns, the order of rows is changed. By default in ascending order (low to high). To change to descening values we add `desc` as follows
+### `transmute()`: Create New Columns (Drop Others)
 
 
 ```r
-# get the smallest popularion sizes in 1992
-head(gapminder %>% filter(year == 1992) %>% arrange(pop))
+# Keep only the newly created columns
+gapminder %>%
+  transmute(
+    country = country,
+    year = year,
+    gdp_total = pop * gdpPercap,
+    pop_millions = pop / 1000000
+  ) %>%
+  head()
+```
+
+```
+## # A tibble: 6 × 4
+##   country      year    gdp_total pop_millions
+##   <fct>       <int>        <dbl>        <dbl>
+## 1 Afghanistan  1952  6567086330.         8.43
+## 2 Afghanistan  1957  7585448670.         9.24
+## 3 Afghanistan  1962  8758855797.        10.3 
+## 4 Afghanistan  1967  9648014150.        11.5 
+## 5 Afghanistan  1972  9678553274.        13.1 
+## 6 Afghanistan  1977 11697659231.        14.9
+```
+
+### `arrange()`: Sort Rows
+
+
+```r
+# Sort by one column (ascending)
+gapminder %>% 
+  filter(year == 2007) %>%
+  arrange(lifeExp) %>%
+  head()
 ```
 
 ```
 ## # A tibble: 6 × 6
-##   country               continent  year lifeExp    pop gdpPercap
-##   <fct>                 <fct>     <int>   <dbl>  <int>     <dbl>
-## 1 Sao Tome and Principe Africa     1992    62.7 125911     1429.
-## 2 Iceland               Europe     1992    78.8 259012    25144.
-## 3 Djibouti              Africa     1992    51.6 384156     2377.
-## 4 Equatorial Guinea     Africa     1992    47.5 387838     1132.
-## 5 Comoros               Africa     1992    57.9 454429     1247.
-## 6 Bahrain               Asia       1992    72.6 529491    19036.
+##   country      continent  year lifeExp      pop gdpPercap
+##   <fct>        <fct>     <int>   <dbl>    <int>     <dbl>
+## 1 Swaziland    Africa     2007    39.6  1133066     4513.
+## 2 Mozambique   Africa     2007    42.1 19951656      824.
+## 3 Zambia       Africa     2007    42.4 11746035     1271.
+## 4 Sierra Leone Africa     2007    42.6  6144562      863.
+## 5 Lesotho      Africa     2007    42.6  2012649     1569.
+## 6 Angola       Africa     2007    42.7 12420476     4797.
 ```
 
 ```r
-# get the highest life expectancies in 2007 in Africa
-head(gapminder %>% filter(year == 2007) %>% filter(continent == 'Africa') %>% arrange(desc(lifeExp)))
+# Sort by multiple columns (descending)
+gapminder %>% 
+  filter(year == 2007) %>%
+  arrange(desc(gdpPercap), desc(lifeExp)) %>%
+  head()
 ```
 
 ```
 ## # A tibble: 6 × 6
-##   country   continent  year lifeExp      pop gdpPercap
-##   <fct>     <fct>     <int>   <dbl>    <int>     <dbl>
-## 1 Reunion   Africa     2007    76.4   798094     7670.
-## 2 Libya     Africa     2007    74.0  6036914    12057.
-## 3 Tunisia   Africa     2007    73.9 10276158     7093.
-## 4 Mauritius Africa     2007    72.8  1250882    10957.
-## 5 Algeria   Africa     2007    72.3 33333216     6223.
-## 6 Egypt     Africa     2007    71.3 80264543     5581.
+##   country          continent  year lifeExp       pop gdpPercap
+##   <fct>            <fct>     <int>   <dbl>     <int>     <dbl>
+## 1 Norway           Europe     2007    80.2   4627926    49357.
+## 2 Kuwait           Asia       2007    77.6   2505559    47307.
+## 3 Singapore        Asia       2007    80.0   4553009    47143.
+## 4 United States    Americas   2007    78.2 301139947    42952.
+## 5 Ireland          Europe     2007    78.9   4109086    40676.
+## 6 Hong Kong, China Asia       2007    82.2   6980412    39725.
 ```
 
-
-**group_by**
-
-The function `group_by()` allows us to group rows in a dataframe based on one or more columns. This does not yet change the dataframe values but rather sets up a grouped structure that works especially well with functions like `summarise()`.
+### `group_by()` and `summarise()`: Group Operations
 
 
 ```r
-# group the data by continent
-gapminder %>% group_by(continent)
-```
-
-```
-## # A tibble: 1,704 × 6
-## # Groups:   continent [5]
-##    country     continent  year lifeExp      pop gdpPercap
-##    <fct>       <fct>     <int>   <dbl>    <int>     <dbl>
-##  1 Afghanistan Asia       1952    28.8  8425333      779.
-##  2 Afghanistan Asia       1957    30.3  9240934      821.
-##  3 Afghanistan Asia       1962    32.0 10267083      853.
-##  4 Afghanistan Asia       1967    34.0 11537966      836.
-##  5 Afghanistan Asia       1972    36.1 13079460      740.
-##  6 Afghanistan Asia       1977    38.4 14880372      786.
-##  7 Afghanistan Asia       1982    39.9 12881816      978.
-##  8 Afghanistan Asia       1987    40.8 13867957      852.
-##  9 Afghanistan Asia       1992    41.7 16317921      649.
-## 10 Afghanistan Asia       1997    41.8 22227415      635.
-## # ℹ 1,694 more rows
-```
-Notice nothing much looks different yet — but now the data is grouped internally. To see its power, we usually combine it with `summarise()`.
-
-
-**summarise**
-
-The function `summarise()` (or `summarize()`) lets us reduce each group to one row by applying summary functions such as `mean()`, `sum()`, `n()` (count rows), etc.
-
-```r
-# average life expectancy per continent in 2007
+# Basic grouping and summarizing
 gapminder %>% 
-  filter(year == 2007) %>% 
-  group_by(continent) %>% 
-  summarise(mean_lifeExp = mean(lifeExp))
-```
-
-```
-## # A tibble: 5 × 2
-##   continent mean_lifeExp
-##   <fct>            <dbl>
-## 1 Africa            54.8
-## 2 Americas          73.6
-## 3 Asia              70.7
-## 4 Europe            77.6
-## 5 Oceania           80.7
-```
-
-```r
-# total population per continent in 2007
-gapminder %>% 
-  filter(year == 2007) %>% 
-  group_by(continent) %>% 
-  summarise(total_pop = sum(pop))
-```
-
-```
-## # A tibble: 5 × 2
-##   continent  total_pop
-##   <fct>          <dbl>
-## 1 Africa     929539692
-## 2 Americas   898871184
-## 3 Asia      3811953827
-## 4 Europe     586098529
-## 5 Oceania     24549947
-```
-
-```r
-# combine multiple summaries
-gapminder %>% 
-  filter(year == 2007) %>% 
+  filter(year == 2007) %>%
   group_by(continent) %>% 
   summarise(
     mean_lifeExp = mean(lifeExp),
     sd_lifeExp = sd(lifeExp),
     total_pop = sum(pop),
-    n_countries = n()
+    n_countries = n(),
+    .groups = 'drop'  # Automatically ungroup
   )
 ```
 
@@ -399,14 +453,422 @@ gapminder %>%
 ## 5 Oceania           80.7      0.729   24549947           2
 ```
 
+```r
+# Multiple grouping variables
+gapminder %>%
+  filter(year %in% c(1997, 2007)) %>%
+  group_by(continent, year) %>%
+  summarise(
+    avg_gdp = mean(gdpPercap),
+    countries = n(),
+    .groups = 'drop'
+  )
+```
 
-new functions:
-- rename
-- as.character/as.numeric/as.Date
-- across()
-- recode
-- case_when
-- replace_na
-- which()
+```
+## # A tibble: 10 × 4
+##    continent  year avg_gdp countries
+##    <fct>     <int>   <dbl>     <int>
+##  1 Africa     1997   2379.        52
+##  2 Africa     2007   3089.        52
+##  3 Americas   1997   8889.        25
+##  4 Americas   2007  11003.        25
+##  5 Asia       1997   9834.        33
+##  6 Asia       2007  12473.        33
+##  7 Europe     1997  19077.        30
+##  8 Europe     2007  25054.        30
+##  9 Oceania    1997  24024.         2
+## 10 Oceania    2007  29810.         2
+```
 
-## Data visualization using ggplot
+## Additional Essential Functions
+
+### `rename()`: Change Column Names
+
+
+```r
+# Rename columns
+gapminder %>%
+  rename(
+    life_expectancy = lifeExp,
+    gdp_per_capita = gdpPercap,
+    population = pop
+  ) %>%
+  head()
+```
+
+```
+## # A tibble: 6 × 6
+##   country     continent  year life_expectancy population gdp_per_capita
+##   <fct>       <fct>     <int>           <dbl>      <int>          <dbl>
+## 1 Afghanistan Asia       1952            28.8    8425333           779.
+## 2 Afghanistan Asia       1957            30.3    9240934           821.
+## 3 Afghanistan Asia       1962            32.0   10267083           853.
+## 4 Afghanistan Asia       1967            34.0   11537966           836.
+## 5 Afghanistan Asia       1972            36.1   13079460           740.
+## 6 Afghanistan Asia       1977            38.4   14880372           786.
+```
+
+```r
+# Rename with a function
+gapminder %>%
+  rename_with(toupper, c(country, continent)) %>%
+  head()
+```
+
+```
+## # A tibble: 6 × 6
+##   COUNTRY     CONTINENT  year lifeExp      pop gdpPercap
+##   <fct>       <fct>     <int>   <dbl>    <int>     <dbl>
+## 1 Afghanistan Asia       1952    28.8  8425333      779.
+## 2 Afghanistan Asia       1957    30.3  9240934      821.
+## 3 Afghanistan Asia       1962    32.0 10267083      853.
+## 4 Afghanistan Asia       1967    34.0 11537966      836.
+## 5 Afghanistan Asia       1972    36.1 13079460      740.
+## 6 Afghanistan Asia       1977    38.4 14880372      786.
+```
+
+### Data Type Conversions
+
+
+```r
+# Create sample data with mixed types
+sample_data <- data.frame(
+  id = c("1", "2", "3"),
+  date_string = c("2020-01-01", "2020-02-01", "2020-03-01"),
+  value = c("10.5", "20.3", "15.7"),
+  stringsAsFactors = FALSE
+)
+
+# Convert data types
+sample_data_converted <- sample_data %>%
+  mutate(
+    id = as.numeric(id),
+    date_string = as.Date(date_string),
+    value = as.numeric(value),
+    id_char = as.character(id)
+  )
+
+str(sample_data_converted)
+```
+
+```
+## 'data.frame':	3 obs. of  4 variables:
+##  $ id         : num  1 2 3
+##  $ date_string: Date, format: "2020-01-01" "2020-02-01" ...
+##  $ value      : num  10.5 20.3 15.7
+##  $ id_char    : chr  "1" "2" "3"
+```
+
+### `across()`: Apply Functions to Multiple Columns
+
+
+```r
+# Apply function to multiple columns
+gapminder %>%
+  group_by(continent) %>%
+  summarise(
+    across(c(lifeExp, pop, gdpPercap), mean),
+    .groups = 'drop'
+  )
+```
+
+```
+## # A tibble: 5 × 4
+##   continent lifeExp       pop gdpPercap
+##   <fct>       <dbl>     <dbl>     <dbl>
+## 1 Africa       48.9  9916003.     2194.
+## 2 Americas     64.7 24504795.     7136.
+## 3 Asia         60.1 77038722.     7902.
+## 4 Europe       71.9 17169765.    14469.
+## 5 Oceania      74.3  8874672.    18622.
+```
+
+```r
+# Apply multiple functions
+gapminder %>%
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarise(
+    across(c(lifeExp, gdpPercap), 
+           list(mean = mean, sd = sd, min = min, max = max)),
+    .groups = 'drop'
+  )
+```
+
+```
+## # A tibble: 5 × 9
+##   continent lifeExp_mean lifeExp_sd lifeExp_min lifeExp_max gdpPercap_mean
+##   <fct>            <dbl>      <dbl>       <dbl>       <dbl>          <dbl>
+## 1 Africa            54.8      9.63         39.6        76.4          3089.
+## 2 Americas          73.6      4.44         60.9        80.7         11003.
+## 3 Asia              70.7      7.96         43.8        82.6         12473.
+## 4 Europe            77.6      2.98         71.8        81.8         25054.
+## 5 Oceania           80.7      0.729        80.2        81.2         29810.
+## # ℹ 3 more variables: gdpPercap_sd <dbl>, gdpPercap_min <dbl>,
+## #   gdpPercap_max <dbl>
+```
+
+### `recode()`: Recode Values
+
+
+```r
+# Recode values
+gapminder %>%
+  mutate(
+    continent_short = recode(continent,
+      "Africa" = "AF",
+      "Americas" = "AM", 
+      "Asia" = "AS",
+      "Europe" = "EU",
+      "Oceania" = "OC"
+    )
+  ) %>%
+  select(country, continent, continent_short) %>%
+  head()
+```
+
+```
+## # A tibble: 6 × 3
+##   country     continent continent_short
+##   <fct>       <fct>     <fct>          
+## 1 Afghanistan Asia      AS             
+## 2 Afghanistan Asia      AS             
+## 3 Afghanistan Asia      AS             
+## 4 Afghanistan Asia      AS             
+## 5 Afghanistan Asia      AS             
+## 6 Afghanistan Asia      AS
+```
+
+### `case_when()`: Multiple Conditional Logic
+
+
+```r
+# Multiple conditions with case_when
+gapminder %>%
+  mutate(
+    development_level = case_when(
+      gdpPercap < 1000 ~ "Low income",
+      gdpPercap < 5000 ~ "Lower middle income", 
+      gdpPercap < 15000 ~ "Upper middle income",
+      gdpPercap >= 15000 ~ "High income",
+      TRUE ~ "Unknown"  # Default case
+    ),
+    pop_size = case_when(
+      pop < 10000000 ~ "Small",
+      pop < 50000000 ~ "Medium",
+      pop >= 50000000 ~ "Large"
+    )
+  ) %>%
+  select(country, year, gdpPercap, development_level, pop, pop_size) %>%
+  filter(year == 2007) %>%
+  head(10)
+```
+
+```
+## # A tibble: 10 × 6
+##    country      year gdpPercap development_level         pop pop_size
+##    <fct>       <int>     <dbl> <chr>                   <int> <chr>   
+##  1 Afghanistan  2007      975. Low income           31889923 Medium  
+##  2 Albania      2007     5937. Upper middle income   3600523 Small   
+##  3 Algeria      2007     6223. Upper middle income  33333216 Medium  
+##  4 Angola       2007     4797. Lower middle income  12420476 Medium  
+##  5 Argentina    2007    12779. Upper middle income  40301927 Medium  
+##  6 Australia    2007    34435. High income          20434176 Medium  
+##  7 Austria      2007    36126. High income           8199783 Small   
+##  8 Bahrain      2007    29796. High income            708573 Small   
+##  9 Bangladesh   2007     1391. Lower middle income 150448339 Large   
+## 10 Belgium      2007    33693. High income          10392226 Medium
+```
+
+### `replace_na()`: Handle Missing Values
+
+
+```r
+# Create data with missing values
+data_with_na <- data.frame(
+  name = c("Alice", "Bob", NA, "David"),
+  age = c(25, NA, 35, 40),
+  city = c("New York", "Boston", "Chicago", NA)
+)
+
+print("Original data:")
+```
+
+```
+## [1] "Original data:"
+```
+
+```r
+data_with_na
+```
+
+```
+##    name age     city
+## 1 Alice  25 New York
+## 2   Bob  NA   Boston
+## 3  <NA>  35  Chicago
+## 4 David  40     <NA>
+```
+
+```r
+# Replace NA values
+data_cleaned <- data_with_na %>%
+  mutate(
+    name = replace_na(name, "Unknown"),
+    age = replace_na(age, median(age, na.rm = TRUE)),
+    city = replace_na(city, "Not specified")
+  )
+
+print("After replacing NA values:")
+```
+
+```
+## [1] "After replacing NA values:"
+```
+
+```r
+data_cleaned
+```
+
+```
+##      name age          city
+## 1   Alice  25      New York
+## 2     Bob  35        Boston
+## 3 Unknown  35       Chicago
+## 4   David  40 Not specified
+```
+
+### `which()`: Find Positions
+
+
+```r
+# Using which to find positions
+sample_vector <- c(10, 25, 30, 15, 40, 35)
+
+# Find positions where condition is TRUE
+positions <- which(sample_vector > 20)
+print(paste("Positions where value > 20:", paste(positions, collapse = ", ")))
+```
+
+```
+## [1] "Positions where value > 20: 2, 3, 5, 6"
+```
+
+```r
+# Use in data frame context
+gapminder %>%
+  filter(year == 2007) %>%
+  mutate(rank_gdp = rank(desc(gdpPercap))) %>%
+  filter(rank_gdp <= 5) %>%
+  select(country, gdpPercap, rank_gdp) %>%
+  arrange(rank_gdp)
+```
+
+```
+## # A tibble: 5 × 3
+##   country       gdpPercap rank_gdp
+##   <fct>             <dbl>    <dbl>
+## 1 Norway           49357.        1
+## 2 Kuwait           47307.        2
+## 3 Singapore        47143.        3
+## 4 United States    42952.        4
+## 5 Ireland          40676.        5
+```
+
+## Practical Example: Data Analysis Workflow
+
+Let's combine multiple functions in a realistic analysis:
+
+
+```r
+# Comprehensive analysis: Life expectancy trends by continent
+life_exp_analysis <- gapminder %>%
+  # Filter for recent decades
+  filter(year >= 1990) %>%
+  # Create additional variables
+  mutate(
+    decade = case_when(
+      year %in% 1990:1999 ~ "1990s",
+      year %in% 2000:2007 ~ "2000s"
+    ),
+    gdp_category = case_when(
+      gdpPercap < 2000 ~ "Low GDP",
+      gdpPercap < 10000 ~ "Medium GDP", 
+      gdpPercap >= 10000 ~ "High GDP"
+    )
+  ) %>%
+  # Group and summarize
+  group_by(continent, decade, gdp_category) %>%
+  summarise(
+    avg_life_exp = mean(lifeExp),
+    countries = n(),
+    total_pop = sum(pop),
+    .groups = 'drop'
+  ) %>%
+  # Filter out small groups
+  filter(countries >= 3) %>%
+  # Arrange results
+  arrange(continent, decade, desc(avg_life_exp))
+
+print("Life expectancy analysis by continent, decade, and GDP category:")
+```
+
+```
+## [1] "Life expectancy analysis by continent, decade, and GDP category:"
+```
+
+```r
+life_exp_analysis
+```
+
+```
+## # A tibble: 21 × 6
+##    continent decade gdp_category avg_life_exp countries  total_pop
+##    <fct>     <chr>  <chr>               <dbl>     <int>      <dbl>
+##  1 Africa    1990s  Medium GDP           61.9        28  381335877
+##  2 Africa    1990s  Low GDP              50.3        74 1019466696
+##  3 Africa    2000s  Medium GDP           59.7        27  632430409
+##  4 Africa    2000s  High GDP             58.5         7   13862646
+##  5 Africa    2000s  Low GDP              51.5        70 1116970553
+##  6 Americas  1990s  High GDP             75.1        10  689423253
+##  7 Americas  1990s  Medium GDP           69.9        38  833511034
+##  8 Americas  2000s  High GDP             76.3        15  976865109
+##  9 Americas  2000s  Medium GDP           72.3        33  755668372
+## 10 Asia      1990s  High GDP             75.0        21  479574324
+## # ℹ 11 more rows
+```
+
+## Function Summary Table
+
+Here's a comprehensive summary of all the tidyverse functions covered:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `select()` | Choose specific columns from a dataset | `select(country, year, pop)` |
+| `filter()` | Choose specific rows based on conditions | `filter(year == 2007, pop > 1000000)` |
+| `mutate()` | Create new columns or modify existing ones | `mutate(gdp_total = pop * gdpPercap)` |
+| `transmute()` | Create new columns and drop all others | `transmute(country, gdp_billions = gdp/1e9)` |
+| `arrange()` | Sort rows by one or more columns | `arrange(desc(lifeExp))` |
+| `group_by()` | Group rows for grouped operations | `group_by(continent, year)` |
+| `summarise()` | Calculate summary statistics for groups | `summarise(mean_life = mean(lifeExp))` |
+| `rename()` | Change column names | `rename(life_expectancy = lifeExp)` |
+| `pivot_longer()` | Convert wide data to long format (tidy) | `pivot_longer(cols = c(col1, col2))` |
+| `pivot_wider()` | Convert long data to wide format | `pivot_wider(names_from = key)` |
+| `across()` | Apply functions to multiple columns at once | `across(c(col1, col2), mean)` |
+| `recode()` | Recode values in a column | `recode(continent, 'Asia' = 'AS')` |
+| `case_when()` | Handle multiple conditional logic | `case_when(pop < 1e6 ~ 'Small')` |
+| `replace_na()` | Replace missing (NA) values | `replace_na(column, 'Unknown')` |
+| `as.numeric()` | Convert to numeric data type | `as.numeric(character_column)` |
+| `as.character()` | Convert to character data type | `as.character(numeric_column)` |
+| `which()` | Find positions where condition is TRUE | `which(vector > threshold)` |
+
+
+## Conclusion
+
+The tidyverse provides a consistent and intuitive grammar for data manipulation in R. By mastering these core functions, you'll be able to efficiently clean, transform, and analyze data. The key principles to remember are:
+
+1. **Start with tidy data** - each variable in a column, each observation in a row
+2. **Use the pipe operator (`%>%`)** to chain operations together
+3. **Combine functions** to create powerful data manipulation workflows
+4. **Group operations** allow for sophisticated analyses across different categories

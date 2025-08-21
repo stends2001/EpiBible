@@ -181,6 +181,16 @@ ggplot(plot_data, aes(x = day, y = count, color = type)) +
 
 <img src="07-epidemiological-modelling_files/figure-html/unnamed-chunk-6-1.png" width="672" />
 
+These compartmental models can be done using population-based equations, like here. One funadmental issue with those though, is that it is very hard to model heterogeneity in the population. In reality, we have clusters of people that are not vaccinated for example. Using the equations above, and adding a V compartment, the model would make the assumption that the vaccinated and unvaccinated are spread evently. That's why sometimes these models are implemented using **agent based models**, where individuals are modelled. The mathematics becomes a bit more complicated, but these models allow us to do much more. Below you will find two examples of such models.
+
+![Caption for your GIF](abm1.gif)
+For the following one, I modelled people moving around two dedicated centers, two cities if you will. There's very little, but some, movement between the cities. The infection start in city 1 and later also spreads to city 2.
+![Caption for your GIF](two_cities_abm.gif)
+
+
+
+
+
 ## Time series - Forecasting  
 
 
