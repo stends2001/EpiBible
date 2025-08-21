@@ -399,4 +399,14 @@ gapminder %>%
 ## 5 Oceania           80.7      0.729   24549947           2
 ```
 
+
+new functions:
+- rename
+- as.character/as.numeric/as.Date
+- across()
+- recode
+- case_when
+- replace_na
+- which()
+
 ## Data visualization using ggplot
