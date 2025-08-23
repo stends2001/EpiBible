@@ -1,4 +1,5 @@
 # Data Visualization in R
+The tidyverse is a bit scary perhaps, when only getting into it. It is very quick to learn though, I promise. The best thing for me personally about the tidyverse, and perhaps about all of R, are the figures one can make with **ggplot2**. It really does not take that much to produce beautiful figures, that are basically publication-ready. It is not that difficult and the figures are much more beautiful than one could ever make with Excel or Statica.
 
 ## ggplot2: The Grammar of Graphics
 
@@ -704,6 +705,26 @@ complex_plot
 | `theme_classic()` | Themes | Apply classic theme | `theme_classic()` |
 | `theme_dark()` | Themes | Apply dark theme | `theme_dark()` |
 | `annotate()` | Annotations | Add annotations to plot | `annotate("text", x = 1, y = 2, label = "Note")` |
+
+## Tips and Tricks
+
+**Colors**
+A good colorscale can make an enormous difference. For discrete data I like to use the scales `Paired`, `Dark2` and for continuous data I like using the `inferno`, `magma` and `coolwarm` palettes. Make sure the scale you choose is intuitive and easy to interpret. When making figures ready for shared or published work, make sure that it is colorblind-friendly (the viridis color palettes are especially chosen for this). And when preparing for a presentation always make sure that your figure would still be readable if the resolution is low (for example because of an old projector). Be prepared! For more information on color scales, have a look at this [website](https://www.datanovia.com/en/blog/top-r-color-palettes-to-know-for-great-data-visualization/).
+
+**Scales and Axes**
+Always label your axes clearly and use units when relevant. If one variable spans many orders of magnitude, consider using a log scale. Also check that your axis limits don’t exaggerate or minimize effects (avoid "truncating" axes unless you have a good reason).
+
+**Faceting**
+When comparing groups or categories, faceting (facet_wrap or facet_grid) is often clearer than putting everything into one crowded plot. It makes patterns easier to see across groups.
+
+**Annotations**
+Don’t be afraid to annotate! Adding text labels, arrows, or lines (like geom_text, geom_label, geom_vline) can help guide the reader to the most important takeaways.
+
+**Themes**
+Use themes (theme_minimal(), theme_classic(), etc.) to quickly adjust the overall look. If you’re preparing figures for teaching or publication, setting a consistent theme across all your figures improves readability. The cool thing is that some very interesting journals and platforms have their own ggplot-themes to be used in R. For this, have a look at the package **ggthemes** which includes `theme_economist()` and `theme_wj()` (Wall Street Journal), among others.
+
+**Clarity in Legends**
+Place legends where they don’t overlap with the data, and make sure the labels are descriptive. Sometimes it’s even better to replace the legend entirely with direct labeling inside the plot.
 
 ## Conclusion
 

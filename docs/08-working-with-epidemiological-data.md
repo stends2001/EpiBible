@@ -4,13 +4,19 @@ Data is at the heart of epidemiology. We look at where and when diseases occur, 
 
 ## Acessing data
 
+Coming soon ...
+
 - raw data
 - cleaned data
 - harmonization -> standardization
 
-data cleaning: fixing or removing incorrect, incosistent or missing data
-data harmonziation: standardization or alignment of data
+data cleaning: fixing or removing incorrect, inconsistent or missing data
+data harmonization: standardization or alignment of data
+
 ## (Imperfect) epidemiological data
+
+Coming soon ... 
+
 
 ## Case Study 1: Yellow Fever
 

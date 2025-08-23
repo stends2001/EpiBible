@@ -1,15 +1,19 @@
 # R fundamentals
 
+Now that we know the basics of how this reader works, and how to organize our files in R, we can get starting with the basics of R. While the first few simple lines of code may not be very exciting, we will start with epidemiological applications soon!
+
 ## Basic Datatypes in R
 
 When coding, we work with variables. Say we start our code with `x=1`, then x is a variable. We can do some calculations with `x`, and we can change `x`, depending on the type of data that the variable is. In R, variables can represent the following **datatypes**: 
 
-| Type      | Description    | Example         |
-| --------- | -------------- | --------------- |
-| Numeric   | Real number    | `3.14`, `-6.7`  |
-| Integer   | Whole number   | `1`, `4`, `16`  |
-| Character | Text or string | `a`, `hello!`   |
-| Logical   | Boolean        | `TRUE`, `FALSE` |
+
+| Type      | Description        | Example         |
+| --------- | ------------------ | --------------- |
+| Numeric   | Real number        | `3.14`, `-6.7`  |
+| Integer   | Whole number       | `1`, `4`, `16`  |
+| Character | Text or **string** | `a`, `hello!`   |
+| Logical   | Boolean            | `TRUE`, `FALSE` |
+
 
 The specification of a datatype is very important. While some datatypes may allow certain functionality, others may not. We can sum two numeric variables, which we can also do for two integers. When we try to add two characters to each other though, R will throw an error. Have a look yourself.
 
@@ -51,9 +55,12 @@ paste0(text1, text2)
 ## [1] "hellothere!"
 ```
 
+Do you see the difference? `paste()` by default concatenates two strings with a space in between them, which `paste0()` does not do.
 
 ## Special datatypes
-Besides the basic types of variables mentioned below, R also supports some special datatypes:
+Besides the basic types of variables mentioned above, R also supports some special datatypes:
+
+
 | Type    | Description                         | Example                 |
 | ------- | ----------------------------------- | ----------------------- |
 | Date    | Calendar date                       | `as.Date('2025-08-01')` |
@@ -62,7 +69,7 @@ Besides the basic types of variables mentioned below, R also supports some speci
 | (-) Inf | Positive or negative infinity       | `1/0`, `-1/0`           |
 | NaN     | Not a Number: undefined mathematics | `0/0`                   |
 
-When working with dates, it is very handy to convert what is normally read as text (so "2025-01-01") into Date because there is some additional functionality for resampling dates, and for plotting dates. The others, so `NA`, `NULL`, `INF` and `NaN` often show something is going wrong in the process, so watch out for these!
+When working with dates, it is very handy to convert what is normally read as text (so "2025-01-01") into Date because there is some additional functionality for plotting dates, for example. The others, so `NA`, `NULL`, `INF` and `NaN` often show something is going wrong in the process, so watch out for these!
 
 
 ## Converting between datatypes
@@ -81,13 +88,13 @@ print(num_x + 10)
 ```
 
 For conversion, watch out for these things:
-- NA introduction: if conversion fails, R returns an NA=> `as.numeric("hello")`
+- ` NA` introduction: if conversion fails, R returns an NA=> `as.numeric("hello")`
 - Loss of information: `as.integer(3.99)` will return 3, not 4!
-- Convering booleans: `as.numeric(TRUE)` returns and `as.numeric(FALSE)` returns 0
+- Converting booleans: `as.numeric(TRUE)` returns 1 and `as.numeric(FALSE)` returns 0
 
 ## Data structures in R
 
-While it's nice to be able to work with variables and single datapoints, more often than not we want to work with objects that include multiple data points, and sometimes even different datatypes. These we call **data structures**. In R, we have the following ones:
+While it's nice to be able to work with variables and single data points, more often than not we want to work with objects that include multiple data points, and sometimes even different datatypes. These we call **data structures**. In R, we have the following ones:
 
 | Structure  | Description                                                                                                                                             | Example                                                                          |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -100,7 +107,8 @@ While it's nice to be able to work with variables and single datapoints, more of
 The **Data frame** is particularly important. Any excel table that we open in R is put into a Data frame.
 
 ### Vectors: The Building Blocks
-Vectors are the most fundamental data structure in R. Even when you assign a single number like x <- 5, you're actually creating a vector with one element! Here's how to work with them:
+
+Vectors are the most fundamental data structure in R. Here's how to work with them:
 Creating vectors:
 
 
@@ -119,7 +127,6 @@ sequence1 <- 1:10           # Numbers 1 to 10
 sequence2 <- seq(0, 1, 0.1) # From 0 to 1 in steps of 0.1
 ```
 
-Vector operations:
 One of R's powerful features is vectorization - operations apply to entire vectors at once:
 
 ```r
@@ -155,7 +162,7 @@ mixed_list <- list(
 simple_list <- list("text", 42, TRUE)
 ```
 
-When to use lists vs vectors:
+**When to use lists vs vectors**
 
 Vectors: When all your data is the same type (all numbers, all text, etc.)
 Lists: When you need to store different types together, or when you want to store complex objects
@@ -186,7 +193,7 @@ print(students)
 ### Indexing: Accessing Your Data
 Once you have data stored in these structures, you need to be able to get specific pieces out. This is called indexing or subsetting.
 
-Position-based indexing (using square brackets []):
+Position-based indexing (using square brackets `[]`):
 
 ```r
 # indexing - vectors
@@ -208,6 +215,7 @@ numbers_vector[3]        # Third element: 30
 ```
 
 ```r
+# you can also use a vector of indices
 numbers_vector[c(1, 3)]  # First and third elements: 10, 30
 ```
 
@@ -342,7 +350,9 @@ One thing we often need to do with our datatypes, are **comparisons**. This is b
 | `<=`      | Less than or equal to    | `4 <= 3`        | `FALSE` |
 | `%in%`    | Element inside an object | `1 %in% c(1,2)` | `TRUE` |
 
+
 And for combining logical statements, we use **operators**, of which these are available:
+
 
 | Operator  | Meaning | Example        | Result  |
 | --------- | ------- | -------------- | ------- |
@@ -404,6 +414,8 @@ for (i in 1:5) { # for i = 1 until i = 5
 ## [1] 5
 ```
 
+Note that in the output, we see `## [1]` numerous times. That's because R prints something that only has one index every time.
+
 That was a classical example where we iterate through a bunch of integers. We can also iterate through other things:
 
 
@@ -422,7 +434,7 @@ for (name in names) {
 ```
 
 ## Functions
-People write code into functions in R. These are sometimes added into packages and published, so that anyone using R can use them. Examples of functions are `paste()`, `log()` (taking the logarithm base 10 of a number) and many others. When we make our own code, we sometimes end up writing huge chunks that we want to repeat, but can't really put in a for loop. For that we can write our own functions! Here I'll show an example testing whether or not our variable is negative or positive:
+People write code into **functions** in R. These are sometimes added into packages and published, so that anyone using R can use them. Examples of functions are `paste()`, `log()` (taking the logarithm base 10 of a number) and many others. When we make our own code, we sometimes end up writing huge chunks that we want to repeat, but can't really put in a for loop. For that we can write our own functions! Here I'll show an example testing whether or not our variable is negative or positive:
 
 
 ```r

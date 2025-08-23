@@ -133,7 +133,8 @@ flu_wide_again
 
 ## Core dplyr Functions for Data Manipulation
 
-Let's explore the essential dplyr functions using the gapminder dataset:
+Let's explore the essential dplyr functions using the gapminder dataset. The Gapminder dataset is a widely used dataset in data science, statistics, and economics that provides a comprehensive view of global development over time. It contains information on countries’ life expectancy, GDP per capita, population, and other socio-economic indicators, often spanning several decades. The dataset is particularly popular for teaching and visualization because it allows users to explore trends across countries, continents, and time. For example, you can track how life expectancy has improved in different regions, how income inequality has changed, or how population growth interacts with economic development. Gapminder is also well known through the Gapminder Foundation and the animated bubble charts popularized by Hans Rosling, which make complex global trends intuitive and engaging.
+
 
 
 ```r

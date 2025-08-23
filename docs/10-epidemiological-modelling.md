@@ -1,5 +1,7 @@
 # Modelling
 
+Models in epidemiology are simplified representations of reality that help us understand, explain, and predict how diseases spread. They take key aspects of complex systems—like populations, contacts, or time—and turn them into frameworks we can analyze. By doing so, models provide a bridge between data and decision-making in public health.
+
 ## Compartmental models  
 
 
@@ -186,10 +188,6 @@ These compartmental models can be done using population-based equations, like he
 ![Caption for your GIF](abm1.gif)
 For the following one, I modelled people moving around two dedicated centers, two cities if you will. There's very little, but some, movement between the cities. The infection start in city 1 and later also spreads to city 2.
 ![Caption for your GIF](two_cities_abm.gif)
-
-
-
-
 
 ## Time series - Forecasting  
 
